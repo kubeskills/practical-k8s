@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.1"/>
+    </filter>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6" />
+    </marker>
+  </defs>
+
+  <!-- Step 1: kubectl -->
+  <rect x="30" y="20" width="200" height="56" rx="10" fill="#f8fafc" stroke="#f59e0b" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="52" cy="48" r="14" fill="#f59e0b"/>
+  <text x="52" y="53" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">1</text>
+  <text x="80" y="44" font-family="monospace" font-size="13" font-weight="600" fill="#92400e">kubectl apply</text>
+  <text x="80" y="60" font-family="system-ui, sans-serif" font-size="10" fill="#94a3b8">User submits desired state</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="230" y1="48" x2="290" y2="48" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 2: API Server -->
+  <rect x="300" y="20" width="200" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="322" cy="48" r="14" fill="#3b82f6"/>
+  <text x="322" y="53" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">2</text>
+  <text x="350" y="44" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e40af">API Server</text>
+  <text x="350" y="60" font-family="system-ui, sans-serif" font-size="10" fill="#60a5fa">Validates &amp; authenticates</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="500" y1="48" x2="560" y2="48" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+
+  <!-- Step 3: etcd -->
+  <rect x="570" y="20" width="200" height="56" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="592" cy="48" r="14" fill="#8b5cf6"/>
+  <text x="592" y="53" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">3</text>
+  <text x="620" y="44" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#5b21b6">etcd</text>
+  <text x="620" y="60" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa">Stores desired state</text>
+
+  <!-- Arrow 3→4 (down) -->
+  <line x1="670" y1="76" x2="670" y2="120" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 4: Scheduler watches -->
+  <rect x="570" y="130" width="200" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="592" cy="158" r="14" fill="#3b82f6"/>
+  <text x="592" y="163" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">4</text>
+  <text x="620" y="154" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e40af">Scheduler</text>
+  <text x="620" y="170" font-family="system-ui, sans-serif" font-size="10" fill="#60a5fa">Picks best node for Pod</text>
+
+  <!-- Arrow 4→5 (down) -->
+  <line x1="670" y1="186" x2="670" y2="230" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 5: Assignment written back -->
+  <rect x="570" y="240" width="200" height="56" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="592" cy="268" r="14" fill="#3b82f6"/>
+  <text x="592" y="273" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">5</text>
+  <text x="620" y="264" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e40af">API Server</text>
+  <text x="620" y="280" font-family="system-ui, sans-serif" font-size="10" fill="#60a5fa">Writes node assignment</text>
+
+  <!-- Arrow 5→6 (left) -->
+  <line x1="570" y1="268" x2="510" y2="268" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 6: kubelet -->
+  <rect x="300" y="240" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="322" cy="268" r="14" fill="#10b981"/>
+  <text x="322" y="273" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">6</text>
+  <text x="350" y="264" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#065f46">kubelet</text>
+  <text x="350" y="280" font-family="system-ui, sans-serif" font-size="10" fill="#6ee7b7">Sees assignment, pulls image</text>
+
+  <!-- Arrow 6→7 (down) -->
+  <line x1="400" y1="296" x2="400" y2="340" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 7: Container runtime -->
+  <rect x="300" y="350" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="322" cy="378" r="14" fill="#10b981"/>
+  <text x="322" y="383" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">7</text>
+  <text x="350" y="374" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#065f46">Container Runtime</text>
+  <text x="350" y="390" font-family="system-ui, sans-serif" font-size="10" fill="#6ee7b7">Starts the container</text>
+
+  <!-- Arrow 7→8 (left) -->
+  <line x1="300" y1="378" x2="240" y2="378" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 8: kube-proxy -->
+  <rect x="30" y="350" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="52" cy="378" r="14" fill="#10b981"/>
+  <text x="52" y="383" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="white">8</text>
+  <text x="80" y="374" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#065f46">kube-proxy</text>
+  <text x="80" y="390" font-family="system-ui, sans-serif" font-size="10" fill="#6ee7b7">Sets up network rules</text>
+
+  <!-- Controller Manager watching -->
+  <rect x="30" y="130" width="200" height="56" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)" stroke-dasharray="6,3"/>
+  <text x="130" y="154" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#92400e">Controller Manager</text>
+  <text x="130" y="172" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#d97706">Watches &amp; reconciles state</text>
+
+  <!-- Dashed line from CM to API Server -->
+  <line x1="230" y1="158" x2="300" y2="48" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Pod running indicator -->
+  <rect x="30" y="430" width="740" height="36" rx="8" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="400" y="454" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#065f46">Pod is running! All components communicated through the API Server.</text>
+</svg>

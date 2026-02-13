@@ -43,7 +43,7 @@ layout: two-cols
 
 Training content on KubeSkills, Cybr, Pluralsight, and INE
 
-Co-author of *Acing the CKA*
+Author of **Acing the Certified Kubernetes Administrator Exam - Second Edition** (acingthecka.com)
 
 ::right::
 
@@ -55,6 +55,11 @@ Co-author of *Acing the CKA*
 
 - https://kubeskills.com
 - GitHub: chadmcrowell
+
+<br>
+
+<img src="/chad-crowell.png" alt="Chad Crowell" class="h-40 mx-auto" />
+<img src="/linkedin-banner-feb-2026.png" alt="Chad Crowell" class="h-20 mx-auto" />
 
 ---
 
@@ -114,23 +119,7 @@ Understanding container orchestration
 
 # The Evolution of Application Deployment
 
-<br>
-
-```
-Traditional Era          Virtualized Era          Container Era
-┌──────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│    App A      │    │  ┌────┐ ┌────┐  │    │ ┌──┐┌──┐┌──┐┌──┐│
-│    App B      │    │  │ VM │ │ VM │  │    │ │C1││C2││C3││C4││
-│    App C      │    │  │App │ │App │  │    │ └──┘└──┘└──┘└──┘│
-│               │    │  │ A  │ │ B  │  │    │   Container      │
-│  One OS       │    │  │OS  │ │OS  │  │    │    Runtime       │
-│               │    │  └────┘ └────┘  │    │                  │
-│  Bare Metal   │    │   Hypervisor     │    │   Host OS        │
-│  Hardware     │    │   Hardware       │    │   Hardware       │
-└──────────────┘    └──────────────────┘    └──────────────────┘
-```
-
-<br>
+<img src="/evolution.svg" class="w-full" />
 
 - **Traditional:** Apps compete for resources on a single OS
 - **Virtualized:** Full OS per VM — isolation but heavy overhead
@@ -186,14 +175,13 @@ Running a **single container** is easy. Running **hundreds across multiple hosts
 
 # Why Kubernetes?
 
-<br>
+<div class="flex gap-8 items-start">
+<div class="flex-1">
 
 - Open source, originally designed by Google (based on Borg)
 - Donated to the **Cloud Native Computing Foundation (CNCF)** in 2015
 - The de facto standard for container orchestration
 - Massive ecosystem and community
-
-<br>
 
 ### Key Benefits
 
@@ -203,7 +191,11 @@ Running a **single container** is easy. Running **hundreds across multiple hosts
 - **Self-healing** — automatically replaces and reschedules failed workloads
 - **Scalable** — from a single node to thousands
 
-<br>
+</div>
+<div class="w-48 mt-4">
+<img src="/k8s-logo.svg" alt="Kubernetes logo" />
+</div>
+</div>
 
 > "Kubernetes is the Linux of the cloud." — Kelsey Hightower
 
@@ -219,36 +211,8 @@ Nodes, pods, control plane, and components
 
 # Kubernetes Architecture Overview
 
-<br>
+<img src="/day1-k8s-architecture.png" alt="Alt text" class="h-96 mx-auto" />
 
-```
-                        ┌─────────────────────────────────────────┐
-                        │            CONTROL PLANE                │
-                        │                                         │
-                        │  ┌───────────┐  ┌──────────────────┐   │
-                        │  │ API Server │  │ Controller Manager│   │
-                        │  └─────┬─────┘  └──────────────────┘   │
-                        │        │                                │
-                        │  ┌─────┴─────┐  ┌──────────────────┐   │
-                        │  │   etcd    │  │    Scheduler     │   │
-                        │  └───────────┘  └──────────────────┘   │
-                        └──────────────────┬──────────────────────┘
-                                           │
-                    ┌──────────────────────┼──────────────────────┐
-                    │                      │                      │
-            ┌───────┴────────┐    ┌───────┴────────┐    ┌───────┴────────┐
-            │   WORKER NODE  │    │   WORKER NODE  │    │   WORKER NODE  │
-            │                │    │                │    │                │
-            │  kubelet       │    │  kubelet       │    │  kubelet       │
-            │  kube-proxy    │    │  kube-proxy    │    │  kube-proxy    │
-            │  container     │    │  container     │    │  container     │
-            │  runtime       │    │  runtime       │    │  runtime       │
-            │                │    │                │    │                │
-            │  ┌───┐ ┌───┐  │    │  ┌───┐ ┌───┐  │    │  ┌───┐ ┌───┐  │
-            │  │Pod│ │Pod│  │    │  │Pod│ │Pod│  │    │  │Pod│ │Pod│  │
-            │  └───┘ └───┘  │    │  └───┘ └───┘  │    │  └───┘ └───┘  │
-            └────────────────┘    └────────────────┘    └────────────────┘
-```
 
 ---
 
@@ -256,15 +220,11 @@ Nodes, pods, control plane, and components
 
 The control plane makes global decisions about the cluster.
 
-<br>
-
 ### kube-apiserver
 
 - The front door to the cluster — all communication goes through it
 - RESTful API — `kubectl`, dashboards, and other tools talk to this
 - Handles authentication, authorization, and admission control
-
-<br>
 
 ### etcd
 
@@ -277,8 +237,6 @@ The control plane makes global decisions about the cluster.
 
 # Control Plane Components (cont.)
 
-<br>
-
 ### kube-scheduler
 
 - Watches for newly created Pods with no assigned node
@@ -287,8 +245,6 @@ The control plane makes global decisions about the cluster.
   - Affinity/anti-affinity rules
   - Taints and tolerations
   - Data locality
-
-<br>
 
 ### kube-controller-manager
 
@@ -305,16 +261,11 @@ The control plane makes global decisions about the cluster.
 
 Every worker node runs these components to maintain running Pods.
 
-<br>
-
 ### kubelet
 
 - Agent running on each node
 - Ensures containers described in PodSpecs are running and healthy
 - Reports node status back to the API server
-- Does **not** manage containers not created by Kubernetes
-
-<br>
 
 ### kube-proxy
 
@@ -322,73 +273,22 @@ Every worker node runs these components to maintain running Pods.
 - Maintains network rules (iptables/IPVS) for Service communication
 - Enables the Service abstraction — pods can be reached via stable IPs
 
-<br>
-
 ### Container Runtime
 
 - Software responsible for running containers
-- Kubernetes supports any **CRI-compatible** runtime
-- Common choices: **containerd**, CRI-O
+- Kubernetes supports any **CRI-compatible** runtime (e.g. **containerd**, CRI-O)
 
 ---
 
 # Pods — The Smallest Deployable Unit
 
-<br>
-
-```
-┌─────────────────── Pod ───────────────────┐
-│                                           │
-│  ┌─────────────┐    ┌─────────────┐       │
-│  │  Container   │    │  Container   │       │
-│  │  (app)       │    │  (sidecar)   │       │
-│  └─────────────┘    └─────────────┘       │
-│                                           │
-│  Shared network namespace (localhost)     │
-│  Shared storage volumes                   │
-│  Shared IPC namespace                     │
-│                                           │
-│  IP: 10.244.1.5                           │
-└───────────────────────────────────────────┘
-```
-
-<br>
-
-- A Pod is a **group of one or more containers** with shared networking and storage
-- Each Pod gets its own **IP address**
-- Containers in a Pod communicate over `localhost`
-- Pods are **ephemeral** — they can be created, destroyed, and replaced at any time
-- You rarely create Pods directly — use Deployments, ReplicaSets, etc.
+<img src="/pod-anatomy.svg" alt="Pod anatomy diagram" class="h-96 mx-auto" />
 
 ---
 
 # How Components Work Together
 
-<br>
-
-### Example: Creating a Deployment
-
-```
-1. kubectl apply → API Server
-       │
-2. API Server validates and stores in etcd
-       │
-3. Scheduler watches for unassigned Pods
-       │
-4. Scheduler assigns Pod to a Node
-       │
-5. kubelet on that Node sees the assignment
-       │
-6. kubelet tells container runtime to pull image and start container
-       │
-7. kube-proxy sets up networking rules for the Pod
-       │
-8. Controller Manager ensures desired replica count is maintained
-```
-
-<br>
-
-> Every component has a single responsibility. They communicate through the **API Server** — no direct component-to-component communication.
+<img src="/component-flow.svg" alt="Component interaction flow" class="h-105 mx-auto" />
 
 ---
 layout: section
@@ -402,8 +302,6 @@ Cluster deployment with kubeadm on Linode
 
 # Cluster Installation Options
 
-<br>
-
 | Method | Use Case | Complexity |
 |--------|----------|------------|
 | **kubeadm** | Production-grade self-managed clusters | Medium |
@@ -414,9 +312,9 @@ Cluster deployment with kubeadm on Linode
 | **kOps** | AWS-optimized clusters | Medium |
 | **Kubespray** | Ansible-based deployment | High |
 
-<br>
+---
 
-### Today: kubeadm
+# Today: kubeadm
 
 - The official Kubernetes cluster bootstrapping tool
 - Creates a **production-ready** cluster
@@ -427,42 +325,13 @@ Cluster deployment with kubeadm on Linode
 
 # Our Lab Environment
 
-<br>
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    Linode Cloud                      │
-│                                                     │
-│  ┌─────────────────┐                                │
-│  │  Control Plane   │  Ubuntu 24.04                  │
-│  │  (cp)            │  4 GB RAM                      │
-│  │                  │  2 CPU                          │
-│  └────────┬─────────┘                                │
-│           │                                          │
-│     ┌─────┴─────┐                                    │
-│     │           │                                    │
-│  ┌──┴────────┐  ┌──┴────────┐                        │
-│  │ Worker 1   │  │ Worker 2   │                       │
-│  │ (worker1)  │  │ (worker2)  │  Ubuntu 24.04         │
-│  │            │  │            │  4 GB RAM              │
-│  └────────────┘  └────────────┘  2 CPU                │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
-
-<br>
-
-- **3 nodes:** 1 control plane + 2 workers
-- **OS:** Ubuntu 24.04 LTS
-- **Cloud:** Linode (Akamai Cloud)
+<img src="/lab-environment.svg" alt="Lab environment diagram" class="h-105 mx-auto" />
 
 ---
 
 # Preparing the Nodes
 
 Before running kubeadm, every node needs:
-
-<br>
 
 ### 1. Disable Swap
 
@@ -472,8 +341,6 @@ sudo sed -i '/ swap / s/^/#/' /etc/fstab
 ```
 
 Kubernetes requires swap to be disabled — the kubelet will not start otherwise.
-
-<br>
 
 ### 2. Load Required Kernel Modules
 
@@ -491,8 +358,6 @@ sudo modprobe br_netfilter
 
 # Preparing the Nodes (cont.)
 
-<br>
-
 ### 3. Set Sysctl Parameters
 
 ```bash
@@ -505,7 +370,9 @@ EOF
 sudo sysctl --system
 ```
 
-<br>
+---
+
+# Preparing the Nodes (cont.)
 
 ### 4. Install containerd
 
@@ -527,8 +394,6 @@ sudo systemctl restart containerd
 
 # Installing kubeadm, kubelet, and kubectl
 
-<br>
-
 ### Add the Kubernetes apt Repository
 
 ```bash
@@ -542,8 +407,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
   sudo tee /etc/apt/sources.list.d/kubernetes.list
 ```
 
-<br>
-
 ### Install and Pin Versions
 
 ```bash
@@ -552,7 +415,7 @@ sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
-> **Important:** Pin the versions so `apt-get upgrade` doesn't accidentally break your cluster.
+> Pin the versions so `apt-get upgrade` doesn't accidentally break your cluster.
 
 ---
 
@@ -560,29 +423,17 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 Run on the **control plane node only**:
 
-<br>
-
 ```bash
 sudo kubeadm init \
   --pod-network-cidr=192.168.0.0/16 \
   --kubernetes-version=stable
 ```
 
-<br>
+---
 
-### What kubeadm init Does
+# What kubeadm init Does
 
-1. **Pre-flight checks** — validates the system is ready
-2. **Generates certificates** — CA, API server, kubelet, etc.
-3. **Generates kubeconfig files** — admin, controller-manager, scheduler
-4. **Creates static Pod manifests** — API server, etcd, scheduler, controller-manager
-5. **Starts the kubelet** — which launches the static Pods
-6. **Applies cluster configuration** — stored in ConfigMaps
-7. **Outputs a join command** — for worker nodes
-
-<br>
-
-> Save the `kubeadm join` command! You'll need it for the worker nodes.
+<img src="/kubeadm-flow.svg" alt="kubeadm init flow" class="h-105 mx-auto" />
 
 ---
 
@@ -590,15 +441,11 @@ sudo kubeadm init \
 
 After `kubeadm init`, set up your kubeconfig:
 
-<br>
-
 ```bash
 mkdir -p $HOME/.kube
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
-
-<br>
 
 ### Verify the Cluster
 
@@ -606,8 +453,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl cluster-info
 kubectl get nodes
 ```
-
-<br>
 
 ```
 NAME    STATUS     ROLES           AGE   VERSION
@@ -622,25 +467,17 @@ cp      NotReady   control-plane   1m    v1.31.x
 
 On each **worker node**, run the join command from `kubeadm init`:
 
-<br>
-
 ```bash
 sudo kubeadm join <control-plane-ip>:6443 \
   --token <token> \
   --discovery-token-ca-cert-hash sha256:<hash>
 ```
 
-<br>
-
-### If You Lost the Join Token
-
-Generate a new one from the control plane:
+If you lost the token, generate a new one from the control plane:
 
 ```bash
 kubeadm token create --print-join-command
 ```
-
-<br>
 
 ### Verify from the Control Plane
 
@@ -661,23 +498,15 @@ worker2   NotReady   <none>          30s   v1.31.x
 
 A **Container Network Interface (CNI)** plugin provides pod networking.
 
-<br>
-
-### Why Do We Need a CNI?
-
 - Each Pod needs its own IP address
 - Pods must communicate across nodes without NAT
 - The Kubernetes networking model **requires** a CNI plugin
-
-<br>
 
 ### Install Calico
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
 ```
-
-<br>
 
 ### Watch Nodes Become Ready
 
@@ -696,15 +525,11 @@ worker2   Ready    <none>          4m    v1.31.x
 
 # Verifying the Cluster
 
-<br>
-
 ### Check Node Status
 
 ```bash
 kubectl get nodes -o wide
 ```
-
-<br>
 
 ### Check System Pods
 
@@ -725,8 +550,6 @@ You should see:
 
 # Inspecting Core Components
 
-<br>
-
 ### Static Pods on the Control Plane
 
 ```bash
@@ -734,15 +557,10 @@ ls /etc/kubernetes/manifests/
 ```
 
 ```
-etcd.yaml
-kube-apiserver.yaml
-kube-controller-manager.yaml
-kube-scheduler.yaml
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
 ```
 
 These are **static Pods** — managed directly by the kubelet, not the API server.
-
-<br>
 
 ### Inspect etcd
 
@@ -759,16 +577,12 @@ kubectl -n kube-system exec etcd-cp -- etcdctl \
 
 # Inspecting Core Components (cont.)
 
-<br>
-
 ### Check the API Server
 
 ```bash
 kubectl get --raw /healthz
 kubectl get --raw /version
 ```
-
-<br>
 
 ### Check Kubelet Status
 
@@ -777,8 +591,6 @@ sudo systemctl status kubelet
 sudo journalctl -u kubelet --no-pager -l | tail -20
 ```
 
-<br>
-
 ### Check the Controller Manager and Scheduler
 
 ```bash
@@ -786,9 +598,7 @@ kubectl get componentstatuses   # deprecated but still works
 kubectl get --raw /readyz?verbose
 ```
 
-<br>
-
-> Understand that the **kubelet** is the only component that runs as a systemd service. Everything else on the control plane runs as a static Pod.
+> The **kubelet** is the only component that runs as a systemd service. Everything else on the control plane runs as a static Pod.
 
 ---
 layout: section
@@ -801,8 +611,6 @@ Time to build your cluster!
 ---
 
 # Lab Overview
-
-<br>
 
 ### Lab 1: Provisioning the Cluster
 Spin up 3 Ubuntu 24.04 instances on Linode (1 control plane + 2 workers)
@@ -826,15 +634,11 @@ Deploy your first application to the cluster
 
 # Lab 6: Deploy Your First Pod
 
-<br>
-
 ### Create an nginx Pod
 
 ```bash
 kubectl run nginx --image=nginx:latest --port=80
 ```
-
-<br>
 
 ### Verify It's Running
 
@@ -844,7 +648,9 @@ kubectl describe pod nginx
 kubectl logs nginx
 ```
 
-<br>
+---
+
+# Lab 6: Deploy Your First Pod (cont.)
 
 ### Expose It
 
@@ -852,8 +658,6 @@ kubectl logs nginx
 kubectl expose pod nginx --type=NodePort --port=80
 kubectl get svc nginx
 ```
-
-<br>
 
 ### Clean Up
 

@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560">
+  <defs>
+    <linearGradient id="cpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wnGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="compGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#eff6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dbeafe;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Control Plane Box -->
+  <rect x="20" y="20" width="860" height="220" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="20" y="20" width="860" height="40" rx="12" fill="url(#cpGrad)"/>
+  <rect x="20" y="48" width="860" height="12" fill="url(#cpGrad)"/>
+  <text x="450" y="47" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="white">CONTROL PLANE</text>
+
+  <!-- API Server -->
+  <rect x="60" y="80" width="180" height="65" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="60" y="80" width="180" height="24" rx="8" fill="#3b82f6"/>
+  <rect x="60" y="96" width="180" height="8" fill="#3b82f6"/>
+  <text x="150" y="97" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="white" font-weight="600">kube-apiserver</text>
+  <text x="150" y="125" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#475569">REST API frontend</text>
+
+  <!-- etcd -->
+  <rect x="270" y="80" width="180" height="65" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="270" y="80" width="180" height="24" rx="8" fill="#8b5cf6"/>
+  <rect x="270" y="96" width="180" height="8" fill="#8b5cf6"/>
+  <text x="360" y="97" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="white" font-weight="600">etcd</text>
+  <text x="360" y="125" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#475569">Key-value store</text>
+
+  <!-- Scheduler -->
+  <rect x="480" y="80" width="180" height="65" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="480" y="80" width="180" height="24" rx="8" fill="#3b82f6"/>
+  <rect x="480" y="96" width="180" height="8" fill="#3b82f6"/>
+  <text x="570" y="97" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="white" font-weight="600">kube-scheduler</text>
+  <text x="570" y="125" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#475569">Pod placement</text>
+
+  <!-- Controller Manager -->
+  <rect x="690" y="80" width="180" height="65" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="690" y="80" width="180" height="24" rx="8" fill="#3b82f6"/>
+  <rect x="690" y="96" width="180" height="8" fill="#3b82f6"/>
+  <text x="780" y="97" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="white" font-weight="600">controller-manager</text>
+  <text x="780" y="125" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#475569">Reconciliation loops</text>
+
+  <!-- Cloud Controller Manager -->
+  <rect x="270" y="162" width="180" height="55" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="6,3" filter="url(#shadow)"/>
+  <text x="360" y="186" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#3b82f6" font-weight="600">cloud-controller-mgr</text>
+  <text x="360" y="203" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#94a3b8">(optional)</text>
+
+  <!-- Connection lines from API Server -->
+  <line x1="240" y1="112" x2="270" y2="112" stroke="#93c5fd" stroke-width="2"/>
+  <line x1="150" y1="145" x2="150" y2="190" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="150" y1="190" x2="270" y2="190" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Connection lines between control plane components -->
+  <line x1="450" y1="112" x2="480" y2="112" stroke="#93c5fd" stroke-width="2"/>
+  <line x1="660" y1="112" x2="690" y2="112" stroke="#93c5fd" stroke-width="2"/>
+
+  <!-- Connection line down to worker nodes -->
+  <line x1="150" y1="240" x2="150" y2="300" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <line x1="450" y1="240" x2="450" y2="300" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <line x1="750" y1="240" x2="750" y2="300" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="8,4"/>
+
+  <!-- Worker Node 1 -->
+  <rect x="20" y="300" width="260" height="240" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="20" y="300" width="260" height="36" rx="12" fill="url(#wnGrad)"/>
+  <rect x="20" y="324" width="260" height="12" fill="url(#wnGrad)"/>
+  <text x="150" y="325" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="white">Worker Node 1</text>
+  <!-- kubelet -->
+  <rect x="40" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="90" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kubelet</text>
+  <!-- kube-proxy -->
+  <rect x="160" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="210" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kube-proxy</text>
+  <!-- Container Runtime -->
+  <rect x="40" y="398" width="220" height="30" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="150" y="418" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46">containerd</text>
+  <!-- Pods -->
+  <rect x="40" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="90" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+  <rect x="155" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="205" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+  <!-- Pods row 2 -->
+  <rect x="40" y="493" width="100" height="35" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="90" y="515" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+
+  <!-- Worker Node 2 -->
+  <rect x="320" y="300" width="260" height="240" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="320" y="300" width="260" height="36" rx="12" fill="url(#wnGrad)"/>
+  <rect x="320" y="324" width="260" height="12" fill="url(#wnGrad)"/>
+  <text x="450" y="325" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="white">Worker Node 2</text>
+  <rect x="340" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="390" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kubelet</text>
+  <rect x="460" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="510" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kube-proxy</text>
+  <rect x="340" y="398" width="220" height="30" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="450" y="418" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46">containerd</text>
+  <rect x="340" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="390" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+  <rect x="455" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="505" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+
+  <!-- Worker Node 3 -->
+  <rect x="620" y="300" width="260" height="240" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="620" y="300" width="260" height="36" rx="12" fill="url(#wnGrad)"/>
+  <rect x="620" y="324" width="260" height="12" fill="url(#wnGrad)"/>
+  <text x="750" y="325" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="white">Worker Node 3</text>
+  <rect x="640" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="690" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kubelet</text>
+  <rect x="760" y="350" width="100" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <text x="810" y="373" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46" font-weight="600">kube-proxy</text>
+  <rect x="640" y="398" width="220" height="30" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="750" y="418" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#065f46">containerd</text>
+  <rect x="640" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="690" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+  <rect x="755" y="440" width="100" height="45" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="805" y="468" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#92400e" font-weight="600">Pod</text>
+</svg>
