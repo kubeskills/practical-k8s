@@ -56,10 +56,10 @@ Author of **Acing the Certified Kubernetes Administrator Exam - Second Edition**
 - https://kubeskills.com
 - GitHub: chadmcrowell
 
-<br>
 
 <img src="/chad-crowell.png" alt="Chad Crowell" class="h-40 mx-auto" />
-<img src="/linkedin-banner-feb-2026.png" alt="Chad Crowell" class="h-20 mx-auto" />
+<br>
+<img src="/linkedin-banner-feb-2026.png" alt="Chad Crowell" class="h-30 mx-auto" />
 
 ---
 
@@ -81,7 +81,6 @@ This program is designed to provide a **practical, hands-on** learning experienc
 ### Logistics
 
 - **Duration:** 4 days (7 hours per day, 28 hours total)
-- **Location:** 4101 Smith School Rd., Bldg. IV, Ste. 100, Austin, TX 78744
 - **Format:** Instructor-led, hands-on with cloud lab environments
 
 ---
@@ -97,11 +96,12 @@ This program is designed to provide a **practical, hands-on** learning experienc
 | **Afternoon** | Installing and Configuring Kubernetes |
 | | Hands-On Labs |
 
-<br>
 
-### Labs Today
+---
 
-- Provision a cluster on Ubuntu 24.04 (1 control plane + 2 workers)
+# Labs Today
+
+- Provision a cluster on Ubuntu 24.04 (1 control plane + 1 worker)
 - Bootstrap with kubeadm and join worker nodes
 - Deploy Calico CNI for pod networking
 - Validate the cluster and explore core components
@@ -119,7 +119,7 @@ Understanding container orchestration
 
 # The Evolution of Application Deployment
 
-<img src="/evolution.svg" class="w-full" />
+<img src="/evolution.svg" class="w-4/5 mx-auto" />
 
 - **Traditional:** Apps compete for resources on a single OS
 - **Virtualized:** Full OS per VM — isolation but heavy overhead
@@ -151,7 +151,6 @@ Understanding container orchestration
 
 Running a **single container** is easy. Running **hundreds across multiple hosts** is not.
 
-<br>
 
 ### Challenges Without Orchestration
 
@@ -161,7 +160,6 @@ Running a **single container** is easy. Running **hundreds across multiple hosts
 - How do you roll out updates without downtime?
 - How do you scale up and down based on demand?
 
-<br>
 
 ### What Orchestration Provides
 
