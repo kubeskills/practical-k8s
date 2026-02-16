@@ -224,12 +224,20 @@ The control plane makes global decisions about the cluster.
 - RESTful API — `kubectl`, dashboards, and other tools talk to this
 - Handles authentication, authorization, and admission control
 
+<img src="/k8s-api-auth.png" alt="Alt text" class="h-56 mx-auto" />
+
+---
+
+# Control Plane Components (cont.)
+
 ### etcd
 
 - Distributed key-value store
 - Stores **all** cluster state and configuration
 - The single source of truth — if etcd is gone, the cluster is gone
-- Always back it up!
+- etcd provides strong consistency through the Raft consensus algorithm
+
+<img src="/etcd-raft.png" alt="Alt text" class="h-56 mx-auto" />
 
 ---
 
@@ -244,6 +252,14 @@ The control plane makes global decisions about the cluster.
   - Taints and tolerations
   - Data locality
 
+
+<img src="/kube-scheduler.png" alt="Alt text" class="h-56 mx-auto" />
+
+
+---
+
+# Control Plane Components (cont.)
+
 ### kube-controller-manager
 
 - Runs controller loops that regulate the state of the cluster
@@ -253,11 +269,16 @@ The control plane makes global decisions about the cluster.
   - **Endpoints Controller** — populates service endpoints
   - **Service Account Controller** — creates default accounts for namespaces
 
+<img src="/kube-controller-manager.png" alt="Alt text" class="h-56 mx-auto" />
+
 ---
 
 # Worker Node Components
 
 Every worker node runs these components to maintain running Pods.
+
+<div class="grid grid-cols-2 gap-8">
+<div>
 
 ### kubelet
 
@@ -269,12 +290,21 @@ Every worker node runs these components to maintain running Pods.
 
 - Network proxy running on each node
 - Maintains network rules (iptables/IPVS) for Service communication
-- Enables the Service abstraction — pods can be reached via stable IPs
+- Enables the Service abstraction
+
+</div>
+<div>
 
 ### Container Runtime
 
 - Software responsible for running containers
 - Kubernetes supports any **CRI-compatible** runtime (e.g. **containerd**, CRI-O)
+
+<br>
+<img src="/worker-node-only.png" alt="Alt text" class="h-56 mx-auto" />
+
+</div>
+</div>
 
 ---
 
@@ -286,7 +316,159 @@ Every worker node runs these components to maintain running Pods.
 
 # How Components Work Together
 
-<img src="/component-flow.svg" alt="Component interaction flow" class="h-105 mx-auto" />
+<img src="/component-flow.svg" alt="Component interaction flow" class="h-92 mx-auto mb-0" />
+<div class="mt-1 p-3 bg-gray-100 border-l-4 border-gray-400 rounded-r text-sm text-black">
+<strong>Key insight:</strong> The API Server is the only component that talks to etcd. All other components (Scheduler, kubelet, Controller Manager) communicate exclusively through the API Server — it is the single source of truth for the entire cluster.
+</div>
+
+---
+
+<div class="text-sm">
+
+# Securing Component Communication with TLS
+
+All communication between components is encrypted and mutually authenticated using TLS certificates.
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+### Server Certificates
+
+Each component that **serves** an API presents a server certificate to prove its identity.
+
+- **API Server** — serves HTTPS on port `6443`
+- **etcd** — serves its API to the API Server
+- **kubelet** — serves its own HTTPS API on each node
+
+</div>
+<div>
+
+### Client Certificates
+
+Each component that **connects** to another presents a client certificate to authenticate itself.
+
+- **kubelet → API Server** — proves node identity
+- **Scheduler → API Server** — proves scheduler identity
+- **Controller Manager → API Server** — proves CM identity
+- **API Server → etcd** — proves API Server identity
+- **API Server → kubelet** — proves API Server identity
+
+</div>
+</div>
+
+<div class="mt-2 p-2 bg-gray-100 border-l-4 border-gray-400 rounded-r text-xs text-black">
+<strong>Mutual TLS (mTLS):</strong> Both sides verify each other's certificates against the cluster CA. This is why <code class="text-green-600">kubeadm init</code> generates a full PKI under <code class="text-green-600">/etc/kubernetes/pki/</code> — without it, no component can join the cluster.
+</div>
+
+</div>
+
+---
+
+# Container Runtime Interface (CRI)
+
+CRI is the plugin API that lets the kubelet use **any** container runtime without being compiled against it.
+
+<div class="grid grid-cols-2 gap-8 mt-4">
+<div>
+
+### How It Works
+
+- kubelet communicates with the runtime over a **gRPC** socket
+- Two services: **RuntimeService** (manage containers) and **ImageService** (manage images)
+- kubelet doesn't care _which_ runtime — only that it speaks CRI
+
+</div>
+<div>
+
+### Common CRI Runtimes
+
+| Runtime | Detail|
+|---------|-------|
+| [**containerd**](https://github.com/containerd/containerd) | Default in most distros, graduated CNCF project |
+| [**CRI-O**](https://github.com/cri-o/cri-o) | Built specifically for Kubernetes, used by OpenShift |
+
+</div>
+</div>
+
+<div class="mt-4 p-3 bg-gray-100 border-l-4 border-gray-400 rounded-r text-sm text-black">
+<strong>History:</strong> Kubernetes originally embedded Docker support directly. The <strong>dockershim</strong> was removed in v1.24 — all runtimes now must implement CRI.
+</div>
+
+---
+
+# Container Network Interface (CNI)
+
+CNI is the standard that defines how **network plugins** configure networking for containers.
+
+### How It Works
+
+- When a pod is created, the kubelet asks the container runtime (not directly the CNI plugin) to create the pod. 
+- The container runtime then creates a network namespace and invokes the CNI plugin with an ADD command
+- Assigns an IP address through its IPAM (IP Address Management) plugin
+- Sets up routing rules and network policies
+- When the pod is terminated, the container runtime issues a DEL command to the CNI plugin, which removes interfaces, releases IP addresses, and cleans up routes.
+
+> Fun Fact: CNM and CNI emerged around the same time (2015-2016) as competing visions for container networking. Docker built CNM tightly integrated with its runtime (using libnetwork), while CoreOS and the broader cloud-native community created CNI as a lightweight, runtime-agnostic specification. CNI won the orchestration wars—Kubernetes, Mesos, and OpenShift all adopted it because its plugin model is simpler to implement and doesn't lock you into Docker.
+
+---
+
+<div style="font-size: 0.625rem;">
+
+# Common CNI Plugins
+
+| Plugin | Notes |
+|--------|-------|
+| **Calico** | L3 networking + network policy, widely adopted |
+| **Cilium** | eBPF-based, advanced observability + security |
+| **Flannel** | Simple overlay network, easy to set up |
+| **Weave Net** | Mesh network with encryption support |
+
+<div class="mt-2 p-2 bg-gray-100 border-l-4 border-gray-400 rounded-r text-xs text-black">
+<strong>Key point:</strong> Kubernetes does <em>not</em> ship with a CNI plugin. You must install one after cluster initialization — without it, Pods cannot communicate across nodes.
+</div>
+
+<div class="mt-2 text-xs">
+🎬 <a href="https://youtu.be/NFApeJRXos4?si=mTF9sUr-k4v-Lqx-" target="_blank">Deep dive: Kubernetes Networking and CNI</a>
+</div>
+
+<a href="https://github.com/containernetworking/cni" target="_blank"><img src="/cni-github.png" alt="CNI spec on GitHub" class="h-96 mx-auto" /></a>
+
+</div>
+
+
+---
+
+# Container Storage Interface (CSI)
+
+CSI is the standard that lets Kubernetes use **any** storage system without built-in driver code.
+
+
+### How It Works
+
+- Storage vendors ship a **CSI driver** as a set of Pods in the cluster
+- Kubernetes calls the driver to **provision**, **attach**, and **mount** volumes
+- Admins define storage options via **StorageClasses**
+
+<a href="https://github.com/container-storage-interface/spec" target="_blank"><img src="/csi-github.png" alt="CSI spec on GitHub" class="h-96 mx-auto" /></a>
+
+---
+
+<div style="font-size: 0.625rem;">
+
+# Common CSI Drivers
+
+| Driver | Notes |
+|--------|-------|
+| [**AWS EBS CSI**](https://github.com/kubernetes-sigs/aws-ebs-csi-driver) | Block storage for EKS |
+| [**GCE PD CSI**](https://github.com/kubernetes-sigs/gcp-compute-persistent-disk-csi-driver) | Persistent disks for GKE |
+| [**Longhorn**](https://github.com/longhorn/longhorn) | acts as the integration layer that translates Kubernetes storage requests (PVCs, StorageClasses) into Longhorn volume operations, enabling dynamic provisioning of replicated volumes distributed across cluster nodes. |
+| **Rook-Ceph** | a distributed storage system that provides block (RBD), file (CephFS), and object (S3/Swift) storage, while Rook handles all the operational complexity. |
+
+<div class="mt-2 p-2 bg-gray-100 border-l-4 border-gray-400 rounded-r text-black">
+<strong>Key point:</strong> In-tree volume plugins (e.g. <code class="text-green-600">kubernetes.io/aws-ebs</code>) are being migrated to CSI drivers. New storage integrations are CSI-only.
+</div>
+
+</div>
 
 ---
 layout: section
