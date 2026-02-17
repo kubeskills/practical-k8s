@@ -45,7 +45,7 @@ February 18, 2026
 
 # Day 2 Agenda
 
-<br>
+<div class="text-sm">
 
 | Time | Topic |
 |------|-------|
@@ -57,6 +57,8 @@ February 18, 2026
 | | Health Checks: Liveness and Readiness Probes |
 | | Common Troubleshooting Commands |
 | | Hands-On Labs |
+
+</div>
 
 ---
 
@@ -167,6 +169,8 @@ The core workload resources
 
 ---
 
+<div class="text-sm">
+
 # Pods — Revisited
 
 A **Pod** is the smallest deployable unit in Kubernetes — one or more containers that share networking and storage.
@@ -194,6 +198,8 @@ spec:
 - **Labels** are key-value pairs used to organize and select pods
 
 > You rarely create bare Pods in production — you use a controller (Deployment, ReplicaSet) to manage them.
+
+</div>
 
 ---
 
@@ -228,9 +234,14 @@ kubectl get pods -l "env!=production"
 
 ---
 
+<div class="text-sm">
+
 # ReplicaSets
 
 A **ReplicaSet** ensures that a specified number of pod replicas are running at any given time.
+
+<div class="grid grid-cols-2 gap-6">
+<div>
 
 ```yaml
 apiVersion: apps/v1
@@ -254,11 +265,29 @@ spec:
         - containerPort: 80
 ```
 
+</div>
+<div>
+
+### How It Works
+
 - The `selector` tells the ReplicaSet which pods to manage
 - The `template` defines what new pods look like
 - If a pod is deleted, the ReplicaSet creates a replacement
 
+### Key Fields
+
+| Field | Purpose |
+|-------|---------|
+| `replicas` | Desired number of pods |
+| `selector` | Label query to find managed pods |
+| `template` | Pod spec for new replicas |
+
 > **In practice**, you almost never create ReplicaSets directly — Deployments manage them for you.
+
+</div>
+</div>
+
+</div>
 
 ---
 
@@ -279,16 +308,15 @@ Deployment → ReplicaSet → Pod, Pod, Pod
 
 ---
 
-# Creating a Deployment
+### Creating a Deployment
 
-### Imperative
+<div class="text-sm">
 
+**Imperative**
 ```bash
 kubectl create deployment nginx --image=nginx:1.27 --replicas=3
 ```
-
-### Declarative
-
+**Declarative**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -310,6 +338,8 @@ spec:
         ports:
         - containerPort: 80
 ```
+
+</div>
 
 ---
 
@@ -593,6 +623,9 @@ kubectl delete deployment nginx
 
 You describe the **desired state** in YAML and let Kubernetes figure out how to get there:
 
+<div class="grid grid-cols-2 gap-6">
+<div>
+
 ```bash
 # apply the desired state — creates or updates
 kubectl apply -f deployment.yaml
@@ -607,6 +640,9 @@ kubectl delete -f deployment.yaml
 - GitOps workflows
 - Anything you want to **version control**
 
+</div>
+<div>
+
 ### The Key Difference
 
 | Approach | Command | Idempotent? | Trackable? |
@@ -615,6 +651,9 @@ kubectl delete -f deployment.yaml
 | Declarative | `kubectl apply` | Yes — creates or updates | Yes — YAML in git |
 
 > **Rule of thumb:** Use imperative for learning and debugging, declarative for everything else.
+
+</div>
+</div>
 
 ---
 
