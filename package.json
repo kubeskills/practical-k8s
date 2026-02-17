@@ -9,10 +9,17 @@
     "build:day1": "slidev build day1/slides.md --out dist/day1",
     "build:day2": "slidev build day2/slides.md --out dist/day2",
     "build:day3": "slidev build day3/slides.md --out dist/day3",
-    "build:day4": "slidev build day4/slides.md --out dist/day4"
+    "build:day4": "slidev build day4/slides.md --out dist/day4",
+    "export:day1": "slidev export day1/slides.md --output dist/day1-slides.pdf --with-toc",
+    "export:day2": "slidev export day2/slides.md --output dist/day2-slides.pdf --with-toc",
+    "export:day3": "slidev export day3/slides.md --output dist/day3-slides.pdf --with-toc",
+    "export:day4": "slidev export day4/slides.md --output dist/day4-slides.pdf --with-toc"
   },
   "dependencies": {
     "@slidev/cli": "^51.0.0",
     "@slidev/theme-default": "latest"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.58.2"
   }
 }

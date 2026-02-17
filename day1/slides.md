@@ -93,6 +93,8 @@ This program is designed to provide a **practical, hands-on** learning experienc
 |------|-------|
 | **Morning** | Containers vs Virtual Machines |
 | | Kubernetes Architecture Overview |
+| | Component Communication & TLS |
+| | Kubernetes Interfaces: CRI, CNI, CSI |
 | **Afternoon** | Installing and Configuring Kubernetes |
 | | Hands-On Labs |
 
@@ -430,7 +432,7 @@ CNI is the standard that defines how **network plugins** configure networking fo
 <div class="mt-2 text-xs">
 🎬 <a href="https://youtu.be/NFApeJRXos4?si=mTF9sUr-k4v-Lqx-" target="_blank">Deep dive: Kubernetes Networking and CNI</a>
 </div>
-
+<a href="https://github.com/containernetworking/cni" target="_blank">https://github.com/containernetworking/cni</a>
 <a href="https://github.com/containernetworking/cni" target="_blank"><img src="/cni-github.png" alt="CNI spec on GitHub" class="h-96 mx-auto" /></a>
 
 </div>
@@ -449,7 +451,9 @@ CSI is the standard that lets Kubernetes use **any** storage system without buil
 - Kubernetes calls the driver to **provision**, **attach**, and **mount** volumes
 - Admins define storage options via **StorageClasses**
 
+<a href="https://github.com/container-storage-interface/spec" target="_blank">https://github.com/container-storage-interface/spec</a>
 <a href="https://github.com/container-storage-interface/spec" target="_blank"><img src="/csi-github.png" alt="CSI spec on GitHub" class="h-96 mx-auto" /></a>
+
 
 ---
 
@@ -503,6 +507,33 @@ Cluster deployment with kubeadm on Linode
 
 ---
 
+# Lab Overview
+
+<div class="text-sm">
+
+**Lab 1: Provisioning the Cluster**
+Spin up 3 Ubuntu 24.04 instances on Linode (1 control plane + 2 workers)
+
+**Lab 2: kubeadm Cluster Initialization**
+Prepare nodes, initialize the control plane, and join worker nodes
+
+**Lab 3: CNI Plugin Installation**
+Deploy Calico for pod networking
+
+**Lab 4: Cluster Validation**
+Verify all nodes are Ready and core components are running
+
+**Lab 5: Exploring Core Components**
+Inspect etcd, API server, and verify system status
+
+**Lab 6: Onboard a Pod**
+Deploy your first application to the cluster
+
+</div>
+
+
+---
+
 # Our Lab Environment
 
 <img src="/lab-environment.svg" alt="Lab environment diagram" class="h-105 mx-auto" />
@@ -516,6 +547,7 @@ Before running kubeadm, every node needs:
 ### 1. Disable Swap
 
 ```bash
+# comment out any lines in /etc/fstab that contain "swap" to prevent swap from being re-enabled on the next boot
 sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
 ```
@@ -525,6 +557,7 @@ Kubernetes requires swap to be disabled — the kubelet will not start otherwise
 ### 2. Load Required Kernel Modules
 
 ```bash
+# Tells Linux to automatically load the overlay (a union filesystem that allows containers to layer read-only image layers with writable container layers) and br_netfilter (enables iptables rules to process traffic that passes through Linux network bridges) kernel modules at boot time—both are required for Kubernetes container networking and filesystem operations. 
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 overlay
 br_netfilter
@@ -541,6 +574,7 @@ sudo modprobe br_netfilter
 ### 3. Set Sysctl Parameters
 
 ```bash
+# enables iptables processing for bridged IPv4 and IPv6 traffic (bridge-nf-call-iptables and bridge-nf-call-ip6tables) and enables IPv4 packet forwarding (ip_forward), which allows the node to route pod traffic correctly.
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -566,6 +600,7 @@ containerd config default | sudo tee /etc/containerd/config.toml
 Set the cgroup driver to systemd:
 
 ```bash
+# enable systemd cgroup driver management for containerd instead of using the default cgroupfs driver
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 sudo systemctl restart containerd
 ```
@@ -579,11 +614,12 @@ sudo systemctl restart containerd
 ```bash
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | \
+# download k8s GPG signing key
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key | \
   sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
-  https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | \
+# create the APT repository configuration file that tells APT where to find k8s packages and which key to use for verification
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /' | \
   sudo tee /etc/apt/sources.list.d/kubernetes.list
 ```
 
@@ -627,7 +663,36 @@ sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-### Verify the Cluster
+The `admin.conf` file is a **kubeconfig** — it contains everything kubectl needs to authenticate to the API server.
+
+---
+
+# What's Inside a kubeconfig?
+
+```yaml
+clusters:          # API server address + cluster CA certificate
+- cluster:
+    certificate-authority-data: <base64-encoded ca.crt>
+    server: https://<control-plane-ip>:6443
+
+users:             # client certificate + private key
+- user:
+    client-certificate-data: <base64-encoded client.crt>
+    client-key-data: <base64-encoded client.key>
+
+contexts:          # binds a user to a cluster (and optionally a namespace)
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+```
+
+> kubectl uses **x509 client certificates** to authenticate — it presents `client.crt` to the API server, which verifies it was signed by the cluster CA. The **CN** (Common Name) in the certificate becomes the username and the **O** (Organization) becomes the group.
+
+---
+
+# kubectl Access
+
+### Verify the Cluster (on the control plane node)
 
 ```bash
 kubectl cluster-info
@@ -640,6 +705,37 @@ cp      NotReady   control-plane   1m    v1.31.x
 ```
 
 > The node shows **NotReady** because we haven't installed a CNI plugin yet. That's next!
+
+---
+
+# kubectl Access from Your Local Machine
+
+### 1. Copy the kubeconfig to your local machine
+
+```bash
+# from your local machine
+scp root@<control-plane-ip>:/etc/kubernetes/admin.conf ~/.kube/config
+```
+
+### 2. Find the hostname the API server certificate expects
+
+```bash
+# check the Subject Alternative Names (SANs) in the API server cert
+ssh root@<control-plane-ip>
+
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout | grep -A1 "Subject Alternative Name"
+```
+
+The output will show the DNS names and IPs the cert is valid for (e.g. `kubernetes`, `kubernetes.default`, the node hostname).
+
+### 3. Update your local hosts file
+
+```bash
+# add an entry so the hostname in the kubeconfig resolves to the control plane IP
+echo "<control-plane-ip>  cp" | sudo tee -a /etc/hosts
+```
+
+Now `kubectl get nodes` works from your laptop, authenticated over TLS.
 
 ---
 
@@ -667,9 +763,8 @@ kubectl get nodes
 
 ```
 NAME      STATUS     ROLES           AGE   VERSION
-cp        NotReady   control-plane   5m    v1.31.x
-worker1   NotReady   <none>          1m    v1.31.x
-worker2   NotReady   <none>          30s   v1.31.x
+cp        NotReady   control-plane   5m    v1.34.x
+worker    NotReady   <none>          1m    v1.34.x
 ```
 
 ---
@@ -728,6 +823,20 @@ You should see:
 
 ---
 
+# Setting bash autocomplete and alias
+
+```bash
+apt update && apt install -y bash-completion
+echo 'source <(kubectl completion bash)' >> ~/.bashrc
+echo 'source /usr/share/bash-completion/bash_completion' >> ~/.bashrc
+echo 'alias k=kubectl' >> ~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >> ~/.bashrc
+source ~/.bashrc
+```
+
+
+---
+
 # Inspecting Core Components
 
 ### Static Pods on the Control Plane
@@ -755,11 +864,58 @@ kubectl -n kube-system exec etcd-cp -- etcdctl \
 
 ---
 
+# Install etcdctl on the Host
+
+Instead of exec-ing into the etcd container, install `etcdctl` directly on the control plane node.
+
+### 1. Download the etcd release
+
+```bash
+ETCD_VERSION="v3.5.21"
+
+curl -fsSL https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz \
+  | sudo tar -xz --strip-components=1 -C /usr/local/bin/ etcd-${ETCD_VERSION}-linux-amd64/etcdctl
+
+# etcdctl defaults to API v2; Kubernetes uses v3, so we must set this to interact with the cluster's data
+export ETCDCTL_API=3
+```
+
+### 2. Verify
+
+```bash
+etcdctl version
+```
+
+---
+
+# Take an etcd Snapshot
+
+### 3. Save a snapshot from the host
+
+```bash
+sudo etcdctl snapshot save /tmp/etcd-backup.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+```
+
+### 4. Verify the snapshot
+
+```bash
+sudo etcdctl snapshot status /tmp/etcd-backup.db --write-out=table
+```
+
+> **Why from the host?** Running `etcdctl` on the host (instead of `kubectl exec`) means backups work even if the API server is down — exactly when you need them most.
+
+---
+
 # Inspecting Core Components (cont.)
 
 ### Check the API Server
 
 ```bash
+# /healthz is the API server's health check endpoint — returns "ok" if the server is able to handle requests
 kubectl get --raw /healthz
 kubectl get --raw /version
 ```
@@ -768,6 +924,7 @@ kubectl get --raw /version
 
 ```bash
 sudo systemctl status kubelet
+
 sudo journalctl -u kubelet --no-pager -l | tail -20
 ```
 
@@ -781,43 +938,127 @@ kubectl get --raw /readyz?verbose
 > The **kubelet** is the only component that runs as a systemd service. Everything else on the control plane runs as a static Pod.
 
 ---
-layout: section
----
 
-# Hands-On Labs
+# Examine Certificates
 
-Time to build your cluster!
+The cluster PKI lives under `/etc/kubernetes/pki/` on the control plane node.
 
----
+### List All Certificates
 
-# Lab Overview
+```bash
+# show every certificate and its expiration date
+sudo kubeadm certs check-expiration
+```
 
-### Lab 1: Provisioning the Cluster
-Spin up 3 Ubuntu 24.04 instances on Linode (1 control plane + 2 workers)
+### Inspect a Specific Certificate
 
-### Lab 2: kubeadm Cluster Initialization
-Prepare nodes, initialize the control plane, and join worker nodes
-
-### Lab 3: CNI Plugin Installation
-Deploy Calico for pod networking
-
-### Lab 4: Cluster Validation
-Verify all nodes are Ready and core components are running
-
-### Lab 5: Exploring Core Components
-Inspect etcd, API server, and verify system status
-
-### Lab 6: Onboard a Pod
-Deploy your first application to the cluster
+```bash
+# examine the API server's serving certificate
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout | \
+  grep -A2 "Validity"
+```
 
 ---
 
-# Lab 6: Deploy Your First Pod
+# Examine certificates (cond.)
+
+### Key Files to Know
+
+| File | Purpose |
+|------|---------|
+| `ca.crt` / `ca.key` | Cluster CA — signs all other certs |
+| `apiserver.crt` | API server serving certificate |
+| `apiserver-kubelet-client.crt` | API server → kubelet client cert |
+| `front-proxy-ca.crt` | CA for the aggregation layer |
+| `etcd/ca.crt` | Separate CA for etcd communication |
+| `sa.key` / `sa.pub` | Key pair for signing ServiceAccount tokens |
+
+> All certificates generated by kubeadm are valid for **1 year** by default. Use `kubeadm certs renew all` to renew them before they expire.
+
+---
+
+# Create a New User
+
+Kubernetes has no "user" object — users are identified by certificates signed by the cluster CA.
+
+### 1. Generate a Private Key and CSR
+
+```bash
+# create a private key for the new user
+openssl genrsa -out jane.key 2048
+
+# create a certificate signing request (CN = username, O = group)
+openssl req -new -key jane.key -out jane.csr -subj "/CN=jane/O=dev-team"
+```
+
+### 2. Sign the Certificate with the Cluster CA
+
+```bash
+sudo openssl x509 -req -in jane.csr \
+  -CA /etc/kubernetes/pki/ca.crt \
+  -CAkey /etc/kubernetes/pki/ca.key \
+  -CAcreateserial \
+  -out jane.crt -days 365
+```
+
+---
+
+# Create a New User (cont.)
+
+### 3. Add Credentials to kubeconfig
+
+```bash
+# set the user credentials
+kubectl config set-credentials jane \
+  --client-certificate=jane.crt \
+  --client-key=jane.key
+
+# create a context for the new user
+kubectl config set-context jane-context \
+  --cluster=kubernetes \
+  --namespace=default \
+  --user=jane
+```
+
+### 4. Test the New User
+
+```bash
+# switch to jane's context
+kubectl config use-context jane-context
+
+# this will fail — jane has no RBAC permissions yet
+kubectl get pods
+```
+
+> **Next step:** You'd create a Role and RoleBinding to grant jane access. We'll cover RBAC in detail on Day 3.
+
+---
+
+# Deploy Your First Pod
 
 ### Create an nginx Pod
 
 ```bash
-kubectl run nginx --image=nginx:latest --port=80
+kubectl run nginx --image=nginx:latest --port=80 --dry-run=client -o yaml > pod.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: nginx
+  name: nginx
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    ports:
+    - containerPort: 80
+```
+
+```bash
+kubectl apply -f pod.yaml
 ```
 
 ### Verify It's Running
@@ -830,7 +1071,7 @@ kubectl logs nginx
 
 ---
 
-# Lab 6: Deploy Your First Pod (cont.)
+# Deploy Your First Pod (cont.)
 
 ### Expose It
 
@@ -846,42 +1087,37 @@ kubectl delete pod nginx
 kubectl delete svc nginx
 ```
 
----
-layout: center
-class: text-center
+> NOTE: kubectl command cheat sheet
+
 ---
 
 # Day 1 Recap
 
-<br>
+### What We Covered Today
 
-**What We Covered Today**
+- ✅ Containers vs Virtual Machines — the evolution of app deployment  
+- ✅ Kubernetes Architecture — control plane, worker nodes, and how they interact  
+- ✅ Component Communication & TLS — mTLS, server/client certificates, cluster PKI  
+- ✅ Kubernetes Interfaces — CRI, CNI, and CSI plugin standards  
+- ✅ Installing Kubernetes — kubeadm from scratch on cloud VMs  
+- ✅ Cluster Validation — verifying nodes, components, and networking  
 
-Containers vs Virtual Machines — the evolution of app deployment
 
-Kubernetes Architecture — control plane, worker nodes, and how they interact
-
-Installing Kubernetes — kubeadm from scratch on cloud VMs
-
-Cluster Validation — verifying nodes, components, and networking
-
-<br>
-
----
-layout: center
-class: text-center
 ---
 
 # Coming Up Tomorrow
 
 ## Day 2: Core Concepts and Workload Management
-
 - Managing Kubernetes Objects (Namespaces, Pods, Deployments)
 - Scaling Applications
 - ConfigMaps and Secrets
 - Health Checks: Liveness and Readiness Probes
 - Working with kubectl
+### Labs
+- Deploying sample applications
+- Rolling updates and rollbacks
+- Using ConfigMaps and Secrets
+- Pod health monitoring and recovery
 
-<br>
 
 ### Questions?
