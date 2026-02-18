@@ -750,7 +750,9 @@ data:
 
 # Consuming ConfigMaps
 
-### As Environment Variables
+<div class="text-sm">
+
+As Environment Variables
 
 ```yaml
 spec:
@@ -773,7 +775,15 @@ Or select specific keys:
           key: APP_ENV
 ```
 
-### As a Mounted Volume
+
+
+</div>
+
+---
+
+# Consuming ConfigMaps (cont.)
+
+As a Mounted Volume
 
 ```yaml
     volumeMounts:
@@ -784,6 +794,7 @@ Or select specific keys:
     configMap:
       name: app-config       # each key becomes a file in /etc/config/
 ```
+
 
 ---
 
@@ -812,6 +823,12 @@ data:
   DB_PASS: czNjcmV0UEBzcw==   # echo -n "s3cretP@ss" | base64
 ```
 
+
+
+---
+
+# Creating Secrets (cont.)
+
 Or use `stringData` to avoid manual base64 encoding:
 
 ```yaml
@@ -819,6 +836,7 @@ stringData:
   DB_USER: admin
   DB_PASS: s3cretP@ss
 ```
+
 
 ---
 
@@ -873,6 +891,10 @@ kubectl create secret tls my-tls-secret \
   --key=tls.key
 ```
 
+---
+
+# Secret Types (cont.)
+
 ### Docker Registry Secret
 
 ```bash
@@ -881,6 +903,7 @@ kubectl create secret docker-registry regcred \
   --docker-username=user \
   --docker-password=pass
 ```
+
 
 ---
 layout: section
@@ -941,6 +964,10 @@ spec:
       periodSeconds: 10
 ```
 
+---
+
+# Liveness Probes (cont.)
+
 ### Command Liveness Probe
 
 ```yaml
@@ -971,8 +998,9 @@ spec:
       periodSeconds: 5
       failureThreshold: 3
 ```
+---
 
-### Liveness vs Readiness
+# Liveness vs Readiness
 
 | | Liveness | Readiness |
 |-|----------|-----------|
@@ -1006,7 +1034,9 @@ spec:
       periodSeconds: 5
 ```
 
-### How It Works
+---
+
+# How It Works
 
 1. On container start, **only** the startup probe runs
 2. Liveness and readiness probes are **disabled** until startup succeeds
@@ -1034,7 +1064,9 @@ kubectl get pods -o wide                   # show node placement and IP
 kubectl describe pod <pod-name>            # detailed events and conditions
 ```
 
-### Common Pod States
+---
+
+# Common Pod States
 
 | Status | Meaning |
 |--------|---------|
@@ -1341,6 +1373,10 @@ spec:
           key: API_KEY
 ```
 
+---
+
+# Lab 4: ConfigMaps and Secrets (cont.)
+
 ```bash
 kubectl apply -f configmap-pod.yaml
 kubectl logs config-demo
@@ -1352,9 +1388,13 @@ Expected output: `Hello from Day 2!` and `API_KEY=my-secret-api-key-12345`.
 
 # Lab 5: Health Checks
 
-### Create a Pod with Probes
+Create a Pod with Probes
 
 Create `probe-demo.yaml`:
+
+---
+
+# Lab 5: Health Checks
 
 ```yaml
 apiVersion: v1

@@ -451,7 +451,7 @@ CSI is the standard that lets Kubernetes use **any** storage system without buil
 - Kubernetes calls the driver to **provision**, **attach**, and **mount** volumes
 - Admins define storage options via **StorageClasses**
 
-<a href="https://github.com/container-storage-interface/spec" target="_blank">https://github.com/container-storage-interface/spec</a>
+<a href="https://github.com/container-storage-interface/spec" target="_blank">github.com/container-storage-interface/spec</a>
 <a href="https://github.com/container-storage-interface/spec" target="_blank"><img src="/csi-github.png" alt="CSI spec on GitHub" class="h-96 mx-auto" /></a>
 
 
