@@ -714,25 +714,21 @@ Both are stored in etcd and can be consumed by pods as **environment variables**
 
 # Creating ConfigMaps
 
-### From Literals
+From Literals
 
 ```bash
 kubectl create configmap app-config \
   --from-literal=APP_ENV=production \
   --from-literal=LOG_LEVEL=info
 ```
-
-### From a File
-
+From a File
 ```bash
 # create a config file
 echo "server.port=8080" > app.properties
 
 kubectl create configmap app-config --from-file=app.properties
 ```
-
-### Declarative YAML
-
+Declarative YAML
 ```yaml
 apiVersion: v1
 kind: ConfigMap
