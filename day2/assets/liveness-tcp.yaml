@@ -1,0 +1,4 @@
+    livenessProbe:
+      tcpSocket:
+        port: 3306               # just checks if the port is open
+      periodSeconds: 10

@@ -1,0 +1,15 @@
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      failureThreshold: 30       # 30 attempts
+      periodSeconds: 10          # every 10s = up to 300s (5 min) to start
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      periodSeconds: 5
