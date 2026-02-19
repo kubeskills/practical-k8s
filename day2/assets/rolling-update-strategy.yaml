@@ -1,0 +1,6 @@
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1    # at most 1 pod can be down during update
+      maxSurge: 1          # at most 1 extra pod above desired count

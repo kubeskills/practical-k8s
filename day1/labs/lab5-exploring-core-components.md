@@ -1,0 +1,206 @@
+# Lab 5: Exploring Core Components
+
+## Objective
+
+Inspect the Kubernetes control plane internals: etcd, the API server, the kubelet, and the cluster PKI. Take an etcd snapshot and examine certificates.
+
+## Background
+
+Understanding where and how the control plane components run is essential for troubleshooting and day-2 operations. Key facts:
+
+- The control plane components (etcd, API server, controller manager, scheduler) run as **static Pods** — manifest files that the kubelet watches directly under `/etc/kubernetes/manifests/`
+- The **kubelet** is the only component that runs as a systemd service on the host (not in a pod)
+- All communication is secured by **TLS certificates** managed under `/etc/kubernetes/pki/`
+- **etcd** is the source of truth for the entire cluster — backing it up regularly is critical
+
+## Steps
+
+### 1. Inspect Static Pod Manifests
+
+On the **control plane node**:
+
+```bash
+ls /etc/kubernetes/manifests/
+```
+
+You should see:
+
+```
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+```
+
+Inspect one:
+
+```bash
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+```
+
+Notice the flags passed to the API server — including the certificate paths, etcd endpoints, and authorization modes.
+
+> **How static Pods work:** The kubelet watches this directory. Any `.yaml` file here is treated as a Pod spec. If you delete the file, the kubelet stops the pod. If you edit it, the kubelet restarts the container automatically. There is no Deployment or ReplicaSet — the kubelet is the controller.
+
+### 2. Inspect etcd via kubectl exec
+
+```bash
+kubectl -n kube-system exec etcd-cp -- etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  member list
+```
+
+This lists the etcd cluster members (just one in our single control plane setup).
+
+### 3. Install etcdctl on the Host
+
+It's better practice to run `etcdctl` directly on the host rather than `kubectl exec` — that way backups work even if the API server is down:
+
+```bash
+ETCD_VERSION="v3.5.21"
+
+curl -fsSL https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz \
+  | sudo tar -xz --strip-components=1 -C /usr/local/bin/ etcd-${ETCD_VERSION}-linux-amd64/etcdctl
+
+export ETCDCTL_API=3
+etcdctl version
+```
+
+> `ETCDCTL_API=3` is required — Kubernetes uses etcd API v3 but the default in older versions of etcdctl is v2.
+
+### 4. Take an etcd Snapshot (Backup)
+
+```bash
+sudo etcdctl snapshot save /tmp/etcd-backup.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+```
+
+Verify the snapshot:
+
+```bash
+sudo etcdctl snapshot status /tmp/etcd-backup.db --write-out=table
+```
+
+Expected output:
+
+```
++----------+----------+------------+------------+
+|   HASH   | REVISION | TOTAL KEYS | TOTAL SIZE |
++----------+----------+------------+------------+
+| abcd1234 |     1234 |        456 |     2.1 MB |
++----------+----------+------------+------------+
+```
+
+> In production, automate this with a CronJob and store snapshots in object storage (S3, Linode Object Storage). You should also encrypt snapshots — they contain all cluster secrets.
+
+### 5. Check the API Server
+
+```bash
+kubectl get --raw /healthz
+kubectl get --raw /version
+kubectl get --raw /readyz?verbose
+```
+
+- `/healthz` — liveness check (returns `ok`)
+- `/readyz?verbose` — readiness check with per-component breakdown
+
+### 6. Check the Kubelet
+
+```bash
+sudo systemctl status kubelet
+sudo journalctl -u kubelet --no-pager -l | tail -20
+```
+
+The kubelet is the only control plane component running as a systemd service. It handles:
+- Watching `/etc/kubernetes/manifests/` for static pod updates
+- Calling the CRI (containerd) to start/stop containers
+- Running liveness and readiness probes
+- Reporting node status to the API server
+
+### 7. Check the Controller Manager and Scheduler
+
+```bash
+kubectl get componentstatuses
+kubectl get --raw /readyz?verbose
+```
+
+### 8. Examine Certificates
+
+```bash
+# show every certificate and its expiration date
+sudo kubeadm certs check-expiration
+```
+
+Inspect the API server certificate specifically:
+
+```bash
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout | \
+  grep -A2 "Validity"
+```
+
+### Key Certificate Files
+
+| File | Purpose |
+|------|---------|
+| `ca.crt` / `ca.key` | Cluster CA — signs all other certs |
+| `apiserver.crt` | API server serving certificate |
+| `apiserver-kubelet-client.crt` | API server → kubelet client cert |
+| `front-proxy-ca.crt` | CA for the aggregation layer |
+| `etcd/ca.crt` | Separate CA for etcd communication |
+| `sa.key` / `sa.pub` | Key pair for signing ServiceAccount tokens |
+
+> All certificates generated by kubeadm expire after **1 year** by default. Renew them before expiry with:
+> ```bash
+> sudo kubeadm certs renew all
+> ```
+
+### 9. (Optional) Create a New User
+
+Kubernetes has no built-in user object — users are identified by x509 certificates signed by the cluster CA:
+
+```bash
+# generate a private key and CSR for user "jane" in group "dev-team"
+openssl genrsa -out jane.key 2048
+openssl req -new -key jane.key -out jane.csr -subj "/CN=jane/O=dev-team"
+
+# sign the certificate with the cluster CA
+sudo openssl x509 -req -in jane.csr \
+  -CA /etc/kubernetes/pki/ca.crt \
+  -CAkey /etc/kubernetes/pki/ca.key \
+  -CAcreateserial \
+  -out jane.crt -days 365
+
+# add jane's credentials to kubeconfig
+kubectl config set-credentials jane \
+  --client-certificate=jane.crt \
+  --client-key=jane.key
+
+kubectl config set-context jane-context \
+  --cluster=kubernetes \
+  --namespace=default \
+  --user=jane
+
+# switch to jane's context — this will fail (no RBAC permissions yet)
+kubectl config use-context jane-context
+kubectl get pods
+```
+
+Switch back to the admin context:
+
+```bash
+kubectl config use-context kubernetes-admin@kubernetes
+```
+
+> The `CN` field in the certificate becomes the Kubernetes username; the `O` field becomes the group. RBAC roles are then bound to usernames and groups.
+
+## Troubleshooting
+
+| Problem | Check |
+|---------|-------|
+| etcdctl member list fails | Wrong cert paths or `ETCDCTL_API` not set to 3 |
+| `kubeadm certs check-expiration` shows expired | Renew with `kubeadm certs renew all` and restart static pods |
+| kubelet not running | `journalctl -u kubelet` — often a config or cert issue |
+| Static pod not starting after editing manifest | Syntax error in the YAML — kubelet will log the parse error |

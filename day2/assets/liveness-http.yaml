@@ -1,0 +1,11 @@
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 10    # wait 10s before first check
+      periodSeconds: 5           # check every 5s
+      failureThreshold: 3        # restart after 3 consecutive failures

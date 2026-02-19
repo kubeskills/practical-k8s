@@ -1,0 +1,6 @@
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy            # exit code 0 = healthy
+      periodSeconds: 5

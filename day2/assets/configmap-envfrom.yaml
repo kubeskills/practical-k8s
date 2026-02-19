@@ -1,0 +1,7 @@
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    envFrom:
+    - configMapRef:
+        name: app-config     # injects ALL keys as env vars
