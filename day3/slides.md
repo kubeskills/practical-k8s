@@ -119,13 +119,13 @@ Kubernetes enforces a flat networking model with four rules:
 When a pod is created, the CNI plugin:
 
 1. Creates a **virtual network interface** (veth pair) for the pod
-2. Assigns an IP from the **pod CIDR** (`10.244.0.0/16` by default)
+2. Assigns an IP from the **pod CIDR** (`192.168.0.0/16` in our cluster)
 3. Sets up routing so other pods can reach this IP
 
 ```
 Node A                          Node B
 ┌──────────────────────┐        ┌──────────────────────┐
-│  Pod A  10.244.1.5   │        │  Pod B  10.244.2.8   │
+│  Pod A  192.168.1.5  │        │  Pod B  192.168.2.8  │
 │  veth0               │        │  veth0               │
 │    │                 │        │    │                 │
 │  cbr0 (bridge)       │        │  cbr0 (bridge)       │
@@ -145,9 +145,9 @@ Node A                          Node B
 **Solution:** A **Service** provides a stable IP and DNS name that load-balances traffic to a set of pods.
 
 ```
-Client → Service (stable IP: 10.96.45.12) → Pod A (10.244.1.5)
-                                           → Pod B (10.244.1.6)
-                                           → Pod C (10.244.2.8)
+Client → Service (stable IP: 10.96.45.12) → Pod A (192.168.1.5)
+                                           → Pod B (192.168.1.6)
+                                           → Pod C (192.168.2.8)
 ```
 
 ### How Services Select Pods
@@ -308,7 +308,7 @@ When you create a Service with a selector, Kubernetes automatically creates an *
 # see the pod IPs behind a service
 kubectl get endpoints web
 # NAME   ENDPOINTS                                         AGE
-# web    10.244.1.5:8080,10.244.1.6:8080,10.244.2.8:8080  5m
+# web    192.168.1.5:8080,192.168.1.6:8080,192.168.2.8:8080  5m
 ```
 
 ### If Endpoints Is Empty
@@ -541,7 +541,7 @@ Controlling where pods run
 
 The **kube-scheduler** watches for unscheduled pods and assigns them to nodes in two phases:
 
-### Phase 1: Filtering
+Phase 1: Filtering
 
 Remove nodes that don't meet requirements:
 - Not enough CPU or memory
@@ -549,7 +549,7 @@ Remove nodes that don't meet requirements:
 - Missing a required node label
 - Volume not available in that zone
 
-### Phase 2: Scoring
+Phase 2: Scoring
 
 Rank remaining nodes and pick the best:
 - Prefer nodes with more free resources
@@ -588,7 +588,18 @@ spec:
 
 # Node Affinity
 
+<div class="grid grid-cols-2 gap-6">
+<div>
+
 Node Affinity is the expressive replacement for `nodeSelector` with required and preferred rules.
+
+| Field | Meaning |
+|-------|---------|
+| `requiredDuring...` | Hard rule — pod won't schedule if no match |
+| `preferredDuring...` | Soft rule — scheduler tries to honor it |
+
+</div>
+<div>
 
 ```yaml
 spec:
@@ -612,10 +623,8 @@ spec:
             - us-east-1a
 ```
 
-| Field | Meaning |
-|-------|---------|
-| `requiredDuring...` | Hard rule — pod won't schedule if no match |
-| `preferredDuring...` | Soft rule — scheduler tries to honor it |
+</div>
+</div>
 
 ---
 
@@ -873,6 +882,9 @@ kubectl get jobs    # shows jobs created by the cronjob
 
 # Cron Schedule Syntax
 
+<div class="grid grid-cols-2 gap-6">
+<div>
+
 ```
 ┌───────── minute (0–59)
 │ ┌───────── hour (0–23)
@@ -883,6 +895,9 @@ kubectl get jobs    # shows jobs created by the cronjob
 * * * * *
 ```
 
+</div>
+<div>
+
 | Schedule | Meaning |
 |----------|---------|
 | `0 * * * *` | Every hour at :00 |
@@ -892,6 +907,9 @@ kubectl get jobs    # shows jobs created by the cronjob
 | `0 2 1 * *` | Monthly on the 1st at 2:00 AM |
 
 > **ConcurrencyPolicy** options: `Allow` (default), `Forbid` (skip if previous is running), `Replace` (kill previous, start new).
+
+</div>
+</div>
 
 ---
 layout: section
@@ -925,6 +943,9 @@ Pod restarts → Container filesystem wiped → Database data gone!
 
 # emptyDir and hostPath
 
+<div class="grid grid-cols-2 gap-6">
+<div>
+
 ### emptyDir — Shared Scratch Space Between Containers in a Pod
 
 ```yaml
@@ -945,6 +966,9 @@ spec:
       mountPath: /data
 ```
 
+</div>
+<div>
+
 ### hostPath — Mount a Node Directory
 
 ```yaml
@@ -955,9 +979,15 @@ spec:
       type: Directory
 ```
 
+</div>
+</div>
+
 ---
 
 # PersistentVolumes (PV)
+
+<div class="grid grid-cols-2 gap-6">
+<div>
 
 A **PersistentVolume** is a piece of storage provisioned by an admin (or dynamically by a StorageClass). It exists **independently of any pod**.
 
@@ -977,6 +1007,9 @@ spec:
     path: /mnt/data    # use a real provisioner in production
 ```
 
+</div>
+<div>
+
 ### Access Modes
 
 | Mode | Abbreviation | Meaning |
@@ -984,6 +1017,9 @@ spec:
 | `ReadWriteOnce` | RWO | One node can read and write |
 | `ReadOnlyMany` | ROX | Many nodes can read |
 | `ReadWriteMany` | RWX | Many nodes can read and write |
+
+</div>
+</div>
 
 ---
 
@@ -1226,6 +1262,7 @@ kubectl get svc -n ingress-nginx
 
 # Ingress Resource
 
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -1239,25 +1276,21 @@ spec:
   - host: myapp.example.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web
-            port:
-              number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: api
-            port:
-              number: 8080
+...
 ```
+
+<div class="text-sm mt-4">
+
+📎 [gist.github.com/chadmcrowell/f987c7a646fed3fe6c6ed9fabcbb21df](https://gist.github.com/chadmcrowell/f987c7a646fed3fe6c6ed9fabcbb21df)
+
+</div>
 
 ---
 
 # Ingress with TLS
+
+<div class="grid grid-cols-2 gap-6">
+<div>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -1283,12 +1316,18 @@ spec:
               number: 80
 ```
 
+</div>
+<div>
+
 ```bash
 # create the TLS secret from cert files
 kubectl create secret tls myapp-tls --cert=tls.crt --key=tls.key
 ```
 
 > In production, use **cert-manager** to automatically provision and renew Let's Encrypt certificates.
+
+</div>
+</div>
 
 ---
 
@@ -1383,23 +1422,14 @@ spec:
   - name: prod-gateway
     namespace: infra
   hostnames:
-  - "myapp.example.com"
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api
-    backendRefs:
-    - name: api-service
-      port: 8080
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: web-service
-      port: 80
+...
 ```
+
+<div class="text-sm mt-4">
+
+📎 [gist.github.com/chadmcrowell/0f3ec25d2fe9d878b7d7a04b46178cfb](https://gist.github.com/chadmcrowell/0f3ec25d2fe9d878b7d7a04b46178cfb)
+
+</div>
 
 ---
 
@@ -1601,8 +1631,7 @@ kubectl delete deployment ssd-app gpu-app
 
 ### Deploy a DaemonSet
 
-```bash
-kubectl apply -f - <<EOF
+```yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -1613,23 +1642,24 @@ spec:
       app: node-logger
   template:
     metadata:
-      labels:
-        app: node-logger
-    spec:
-      containers:
-      - name: logger
-        image: busybox
-        command: ["sh", "-c", "while true; do echo node: \$NODE_NAME; sleep 10; done"]
-        env:
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-EOF
+...
+```
 
+<div class="text-sm mt-4">
+
+📎 [gist.github.com/chadmcrowell/7317bc753d0df77ca9e1a7b4042d69fd](https://gist.github.com/chadmcrowell/7317bc753d0df77ca9e1a7b4042d69fd)
+
+</div>
+
+
+
+```bash
 # one pod per node
 kubectl get pods -o wide -l app=node-logger
 ```
+
+
+
 
 ---
 
@@ -1685,6 +1715,9 @@ kubectl get pvc data-pvc    # Pending → Bound after pod uses it
 
 # Lab 5: Persistent Storage (cont.)
 
+<div class="grid grid-cols-2 gap-6">
+<div>
+
 ### Deploy a Pod that Uses the PVC
 
 ```bash
@@ -1708,6 +1741,9 @@ spec:
 EOF
 ```
 
+</div>
+<div>
+
 ```bash
 kubectl get pvc data-pvc             # should be Bound
 kubectl exec storage-demo -- cat /data/test.txt
@@ -1721,9 +1757,15 @@ kubectl apply -f storage-demo.yaml
 kubectl exec storage-demo -- cat /data/test.txt   # data still there!
 ```
 
+</div>
+</div>
+
 ---
 
 # Lab 6: Ingress
+
+<div class="grid grid-cols-2 gap-6">
+<div>
 
 ### Deploy Two Services
 
@@ -1736,10 +1778,12 @@ kubectl create deployment api --image=hashicorp/http-echo \
 kubectl expose deployment api --port=5678 --name=api-svc
 ```
 
+</div>
+<div>
+
 ### Create an Ingress
 
-```bash
-kubectl apply -f - <<EOF
+```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -1751,22 +1795,18 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web-svc
-            port:
-              number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: api-svc
-            port:
-              number: 5678
-EOF
+...
 ```
+
+<div class="text-sm mt-4">
+
+📎 [gist.github.com/chadmcrowell/c8fcf57d994d97cab0f336046635aa22](https://gist.github.com/chadmcrowell/c8fcf57d994d97cab0f336046635aa22)
+
+</div>
+
+
+</div>
+</div>
 
 ---
 
