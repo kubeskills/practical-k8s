@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+spec:
+  schedule: "0 2 * * *"       # run at 2:00 AM every day
+  concurrencyPolicy: Forbid    # don't run if previous is still running
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: backup-tool:latest
+            command: ["/backup.sh"]

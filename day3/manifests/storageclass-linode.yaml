@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: linode-block-storage
+provisioner: linodebs.csi.linode.com
+parameters:
+  type: standard
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer  # delay binding until pod is scheduled
+allowVolumeExpansion: true

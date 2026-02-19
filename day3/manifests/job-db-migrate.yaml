@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrate
+spec:
+  completions: 1          # total successful completions required
+  parallelism: 1          # pods running simultaneously
+  backoffLimit: 3         # retry up to 3 times on failure
+  template:
+    spec:
+      restartPolicy: OnFailure    # required for Jobs (Never or OnFailure)
+      containers:
+      - name: migrate
+        image: myapp:latest
+        command: ["python", "manage.py", "migrate"]
