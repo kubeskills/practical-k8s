@@ -14,7 +14,7 @@ Expose a Deployment to external traffic using a NodePort Service, then upgrade t
 
 - The Deployment from Lab 1 (`web`) must be running. If not, recreate it:
   ```bash
-  kubectl create deployment web --image=nginx:1.27 --replicas=3
+  kubectl create deployment k8sapp --image=chadmcrowell/nginx-for-k8s:v2 --replicas=3
   ```
 
 ## Steps
@@ -22,7 +22,7 @@ Expose a Deployment to external traffic using a NodePort Service, then upgrade t
 ### 1. Create a NodePort Service
 
 ```bash
-kubectl expose deployment web --port=80 --type=NodePort --name=web-nodeport
+kubectl expose deployment k8sapp --port=80 --type=NodePort --name=web-nodeport
 kubectl get svc web-nodeport
 ```
 
@@ -44,7 +44,7 @@ curl http://<any-node-ip>:<nodeport>
 ### 2. Create a LoadBalancer Service (Linode CCM)
 
 ```bash
-kubectl expose deployment web --port=80 --type=LoadBalancer --name=web-lb
+kubectl expose deployment k8sapp --port=80 --type=LoadBalancer --name=web-lb
 ```
 
 Watch for the external IP to be assigned (this takes about 60 seconds as the CCM provisions a NodeBalancer):
