@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Day 3 kubectl Commands
 # Practical Kubernetes Administration and Troubleshooting
-# February 19, 2026
 
 # ============================================================
 # SERVICES — ClusterIP

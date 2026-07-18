@@ -1,7 +1,6 @@
 # Day 3 — Networking, Scheduling, and Storage
 
 **Practical Kubernetes Administration and Troubleshooting**
-February 19, 2026
 
 ---
 

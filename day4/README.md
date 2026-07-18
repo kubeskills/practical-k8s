@@ -1,7 +1,6 @@
 # Day 4 — Security, Monitoring, and Troubleshooting
 
 **Practical Kubernetes Administration and Troubleshooting**
-February 20, 2026
 
 ---
 

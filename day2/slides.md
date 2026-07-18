@@ -3,7 +3,7 @@ theme: default
 title: "Day 2: Core Concepts and Workload Management"
 info: |
   Practical Kubernetes Administration and Troubleshooting
-  Day 2 - February 18, 2026
+  Day 2: Core Concepts and Workload Management
   Instructor: Chad M. Crowell
 class: text-center
 drawings:
@@ -15,8 +15,6 @@ mdc: true
 # Practical Kubernetes Administration and Troubleshooting
 
 ## Day 2: Core Concepts and Workload Management
-
-February 18, 2026
 
 <br>
 

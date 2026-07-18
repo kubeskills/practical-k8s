@@ -3,7 +3,7 @@ theme: default
 title: "Day 3: Networking, Scheduling, and Storage"
 info: |
   Practical Kubernetes Administration and Troubleshooting
-  Day 3 - February 19, 2026
+  Day 3: Networking, Scheduling, and Storage
   Instructor: Chad M. Crowell
 class: text-center
 drawings:
@@ -15,8 +15,6 @@ mdc: true
 # Practical Kubernetes Administration and Troubleshooting
 
 ## Day 3: Networking, Scheduling, and Storage
-
-February 19, 2026
 
 <br>
 

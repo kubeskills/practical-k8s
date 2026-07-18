@@ -3,7 +3,7 @@ theme: default
 title: "Day 4: Security, Monitoring, and Troubleshooting"
 info: |
   Practical Kubernetes Administration and Troubleshooting
-  Day 4 - February 20, 2026
+  Day 4: Security, Monitoring, and Troubleshooting
   Instructor: Chad M. Crowell
 class: text-center
 drawings:
@@ -15,8 +15,6 @@ mdc: true
 # Practical Kubernetes Administration and Troubleshooting
 
 ## Day 4: Security, Monitoring, and Troubleshooting
-
-February 20, 2026
 
 <br>
 

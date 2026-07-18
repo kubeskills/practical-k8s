@@ -3,7 +3,7 @@ theme: default
 title: "Day 1: Foundations and Cluster Setup"
 info: |
   Practical Kubernetes Administration and Troubleshooting
-  Day 1 - February 17, 2026
+  Day 1: Foundations and Cluster Setup
   Instructor: Chad M. Crowell
 class: text-center
 drawings:
@@ -15,8 +15,6 @@ mdc: true
 # Practical Kubernetes Administration and Troubleshooting
 
 ## Day 1: Foundations and Cluster Setup
-
-February 17, 2026
 
 <br>
 

@@ -1,7 +1,6 @@
 # Day 2 Labs — Workloads, Configuration, and Troubleshooting
 
 **Practical Kubernetes Administration and Troubleshooting**
-February 18, 2026
 
 ---
 

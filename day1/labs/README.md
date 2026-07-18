@@ -1,7 +1,6 @@
 # Day 1 Labs — Foundations and Cluster Setup
 
 **Practical Kubernetes Administration and Troubleshooting**
-February 17, 2026
 
 ---
 

@@ -1,7 +1,6 @@
 # Day 3 Labs — Networking, Scheduling, and Storage
 
 **Practical Kubernetes Administration and Troubleshooting**
-February 19, 2026
 
 ---
 

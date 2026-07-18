@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Day 4: Security, Monitoring, and Troubleshooting
 # Practical Kubernetes Administration and Troubleshooting
-# February 20, 2026
 
 # ============================================================
 # RBAC — Roles, ClusterRoles, Bindings
