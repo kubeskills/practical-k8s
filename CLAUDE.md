@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-4-day hands-on Kubernetes training course (NobleProg Austin, Feb 2026). This is **training content**, not production infrastructure — manifests are teaching tools with complexity increasing progressively across days.
+4-day hands-on Kubernetes training course (NobleProg). This is **training content**, not production infrastructure — manifests are teaching tools with complexity increasing progressively across days.
 
 ## Commands
 
