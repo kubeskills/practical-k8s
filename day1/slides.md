@@ -777,7 +777,7 @@ A **Container Network Interface (CNI)** plugin provides pod networking.
 
 ```bash
 # Download the manifest
-wget https://raw.githubusercontent.com/projectcalico/calico/v3.28/manifests/calico.yaml
+wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
 
 # Edit the CALICO_IPV4POOL_CIDR
 sed -i 's|# - name: CALICO_IPV4POOL_CIDR|- name: CALICO_IPV4POOL_CIDR|' calico.yaml
