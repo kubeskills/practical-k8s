@@ -51,7 +51,7 @@ Author of **Acing the Certified Kubernetes Administrator Exam - Second Edition**
 
 ### Connect
 
-- https://kubeskills.com
+- https://chadmcrowell.com
 - GitHub: chadmcrowell
 
 
@@ -613,12 +613,10 @@ sudo systemctl restart containerd
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
 # download k8s GPG signing key
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # create the APT repository configuration file that tells APT where to find k8s packages and which key to use for verification
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /' | \
-  sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 ```
 
 ### Install and Pin Versions
@@ -639,7 +637,7 @@ Run on the **control plane node only**:
 
 ```bash
 sudo kubeadm init \
-  --pod-network-cidr=192.168.0.0/16 \
+  --pod-network-cidr=10.100.0.0/16 \
   --kubernetes-version=stable
 ```
 
@@ -778,7 +776,15 @@ A **Container Network Interface (CNI)** plugin provides pod networking.
 ### Install Calico
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+# Download the manifest
+wget https://raw.githubusercontent.com/projectcalico/calico/v3.28/manifests/calico.yaml
+
+# Edit the CALICO_IPV4POOL_CIDR
+sed -i 's|# - name: CALICO_IPV4POOL_CIDR|- name: CALICO_IPV4POOL_CIDR|' calico.yaml
+sed -i 's|# value: "192.168.0.0/16"| value: "10.100.0.0/16"|' calico.yaml
+
+# Apply
+kubectl apply -f calico.yaml
 ```
 
 ### Watch Nodes Become Ready
