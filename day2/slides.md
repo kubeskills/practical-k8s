@@ -1165,7 +1165,7 @@ If the liveness probe fails, the kubelet **restarts the container**.
 spec:
   containers:
   - name: app
-    image: myapp:latest
+    image: k8s.gcr.io/echoserver:1.10
     livenessProbe:
       httpGet:
         path: /healthz
