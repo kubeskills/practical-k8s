@@ -928,6 +928,11 @@ data:
 Or use `stringData` to avoid manual base64 encoding:
 
 ```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
 stringData:
   DB_USER: admin
   DB_PASS: s3cretP@ss
