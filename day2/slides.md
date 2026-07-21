@@ -1483,7 +1483,7 @@ kubectl get rs
 
 ```bash
 # update to a non-existent image
-kubectl set image deployment/web nginx=nginx:9.99.99
+kubectl set image deployment/web httpd=httpd:9.99.99
 
 # watch it fail
 kubectl rollout status deployment/web
