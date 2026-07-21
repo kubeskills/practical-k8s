@@ -855,6 +855,10 @@ spec:
 Or select specific keys:
 
 ```yaml
+spec:
+  containers:
+  - name: app
+    image: myyapp:latest
     env:
     - name: APP_ENVIRONMENT
       valueFrom:
