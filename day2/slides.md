@@ -1470,7 +1470,7 @@ kubectl get pods -l app=web -o wide
 
 ```bash
 # update the image to a newer version
-kubectl set image deployment/web http=httpd:2.4.68
+kubectl set image deployment/web httpd=httpd:2.4.68
 
 # watch the rollout
 kubectl rollout status deployment/web
