@@ -1018,7 +1018,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: webapp-config
-  namespace: demo
+  namespace: dev
 data:
   APP_ENV: production
   LOG_LEVEL: info
@@ -1032,7 +1032,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: webapp-secrets
-  namespace: demo
+  namespace: dev
 type: Opaque
 stringData:
   DB_USER: webapp
@@ -1051,7 +1051,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webapp
-  namespace: demo
+  namespace: dev
 spec:
   replicas: 2
   selector:
@@ -1069,8 +1069,6 @@ spec:
 
 ```yaml
     spec:
-      securityContext:
-        runAsNonRoot: true
       containers:
       - name: webapp
         image: nginx:1.27.2
