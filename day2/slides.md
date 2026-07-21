@@ -1178,9 +1178,10 @@ spec:
 ### TCP Liveness Probe
 
 ```yaml
+    image: nginx:1.28
     livenessProbe:
       tcpSocket:
-        port: 3306               # just checks if the port is open
+        port: 80               # just checks if the port is open
       periodSeconds: 10
 ```
 
