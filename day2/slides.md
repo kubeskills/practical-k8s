@@ -858,7 +858,7 @@ Or select specific keys:
 spec:
   containers:
   - name: app
-    image: myyapp:latest
+    image: myapp:latest
     env:
     - name: APP_ENVIRONMENT
       valueFrom:
@@ -878,6 +878,10 @@ spec:
 As a Mounted Volume
 
 ```yaml
+spec:
+  containers:
+  - image: myapp:latest
+    name: app
     volumeMounts:
     - name: config-volume
       mountPath: /etc/config
