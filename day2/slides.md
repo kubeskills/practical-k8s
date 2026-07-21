@@ -1435,7 +1435,7 @@ Deploying, updating, configuring, and troubleshooting
 ### Create a Deployment
 
 ```bash
-kubectl create deployment web --image=nginx:1.27 --replicas=3 \
+kubectl create deployment web --image=httpd --replicas=3 \
   --dry-run=client -o yaml > web-deployment.yaml
 ```
 
@@ -1470,7 +1470,7 @@ kubectl get pods -l app=web -o wide
 
 ```bash
 # update the image to a newer version
-kubectl set image deployment/web nginx=nginx:1.28
+kubectl set image deployment/web http=httpd:2.4.68
 
 # watch the rollout
 kubectl rollout status deployment/web
