@@ -21,6 +21,42 @@ mdc: true
 **Instructor:** Chad M. Crowell
 
 ---
+layout: section
+---
+
+# Day 1 Knowledge Check
+
+5 quick questions before we dive into Day 2
+
+---
+
+# Quiz: Day 1 Recap
+
+<div class="text-sm">
+
+1. What is the **only** control plane component that communicates directly with etcd?
+2. Which Kubernetes interface — CRI, CNI, or CSI — is responsible for assigning a Pod its IP address?
+3. What command initializes the control plane node with kubeadm?
+4. True or False: Kubernetes ships with a default CNI plugin out of the box.
+5. When a component **connects** to another component (e.g. kubelet → API server), what type of certificate does it present to authenticate itself?
+
+</div>
+
+---
+
+# Quiz: Answers
+
+<div class="text-sm">
+
+1. **The API Server** — all other components (scheduler, kubelet, controller manager) talk to etcd only through it
+2. **CNI** — the Container Network Interface plugin assigns the Pod IP via its IPAM plugin
+3. `kubeadm init --pod-network-cidr=<cidr> --kubernetes-version=stable`
+4. **False** — Kubernetes does not ship with a CNI plugin; you must install one yourself (e.g. Calico)
+5. **A client certificate** — verified by the receiving component against the cluster CA (mTLS)
+
+</div>
+
+---
 
 # Day 1 Recap
 
@@ -306,15 +342,16 @@ Deployment → ReplicaSet → Pod, Pod, Pod
 
 ---
 
-### Creating a Deployment
+# Creating a Deployment: Imperative
 
-<div class="text-sm">
-
-**Imperative**
 ```bash
 kubectl create deployment nginx --image=nginx:1.27 --replicas=3
 ```
-**Declarative**
+
+---
+
+# Creating a Deployment: Declarative
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -336,8 +373,6 @@ spec:
         ports:
         - containerPort: 80
 ```
-
-</div>
 
 ---
 
@@ -420,7 +455,9 @@ spec:
 | `maxUnavailable` | Max pods that can be unavailable during the update |
 | `maxSurge` | Max pods that can exist above the desired replica count |
 
-### The Other Strategy: Recreate
+---
+
+# The Other Strategy: Recreate
 
 ```yaml
 spec:
@@ -898,6 +935,127 @@ kubectl create secret docker-registry regcred \
   --docker-password=pass
 ```
 
+---
+
+# Full Example: ConfigMap + Secret
+
+A realistic app needs both — non-sensitive settings in a ConfigMap, credentials in a Secret.
+
+<div class="text-sm">
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config
+  namespace: demo
+data:
+  APP_ENV: production
+  LOG_LEVEL: info
+  app.properties: |
+    server.port=8080
+    cache.ttl=300
+```
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secrets
+  namespace: demo
+type: Opaque
+stringData:
+  DB_USER: webapp
+  DB_PASS: Tr@iningOnly123
+  API_KEY: sk-demo-1234567890
+```
+
+</div>
+
+---
+
+# Full Example: Consuming Both
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+```
+
+---
+
+# Full Example: Consuming Both (cont.)
+
+```yaml
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: webapp
+        image: nginx:1.27.2
+        envFrom:
+        - configMapRef:
+            name: webapp-config     # APP_ENV, LOG_LEVEL as env vars
+        - secretRef:
+            name: webapp-secrets    # DB_USER, DB_PASS, API_KEY as env vars
+```
+
+---
+
+# Full Example: Consuming Both (cont. 2)
+
+<div class="text-sm">
+
+```yaml
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config    # app.properties as a file
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+      volumes:
+      - name: config-volume
+        configMap:
+          name: webapp-config
+      - name: secret-volume
+        secret:
+          secretName: webapp-secrets
+```
+
+</div>
+
+---
+
+# Verifying the Full Example
+
+```bash
+# confirm env vars landed in the pod
+kubectl exec deploy/webapp -n demo -- env | grep -E 'APP_ENV|DB_USER'
+
+# confirm mounted files from both ConfigMap and Secret
+kubectl exec deploy/webapp -n demo -- ls /etc/config /etc/secrets
+
+# decode a secret value manually (base64, not encrypted)
+kubectl get secret webapp-secrets -n demo -o jsonpath='{.data.DB_PASS}' | base64 -d
+```
 
 ---
 layout: section
@@ -1263,6 +1421,10 @@ kubectl rollout status deployment/web
 kubectl get pods
 ```
 
+---
+
+# Lab 2: Rolling Updates and Rollbacks (cont.)
+
 ### Roll Back
 
 ```bash
@@ -1414,6 +1576,13 @@ spec:
         command: ["cat", "/tmp/healthy"]
       initialDelaySeconds: 5
       periodSeconds: 5
+```
+
+---
+
+# Lab 5: Health Checks (cont.)
+
+```yaml
     readinessProbe:
       exec:
         command: ["cat", "/tmp/healthy"]
