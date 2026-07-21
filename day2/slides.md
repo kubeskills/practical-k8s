@@ -544,6 +544,10 @@ The **Metrics Server** must be installed in the cluster:
 
 ```bash
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# tell Metrics Server to skip kubelet cert validation
+kubectl patch deployment metrics-server -n kube-system --type='json' \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 ```
 
 ### Create an HPA
