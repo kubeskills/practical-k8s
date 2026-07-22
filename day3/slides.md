@@ -1342,6 +1342,20 @@ spec:
 
 </div>
 
+```
+# Get your ingress controller's external IP or node IP
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+
+# Or if using hostNetwork, just use your control plane IP
+NODE_IP=$(hostname -I | awk '{print $1}')
+
+# Add to /etc/hosts (replace with your actual ingress host)
+echo "$NODE_IP test.example.com" | sudo tee -a /etc/hosts
+
+# Now curl normally
+curl http://test.example.com
+```
+
 ---
 
 # Ingress with TLS
