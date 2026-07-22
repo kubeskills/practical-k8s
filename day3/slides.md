@@ -1331,7 +1331,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: your-service
+            name: web
             port:
               number: 80
 ```
@@ -1342,18 +1342,15 @@ spec:
 
 </div>
 
-```
-# Get your ingress controller's external IP or node IP
-kubectl get svc -n ingress-nginx ingress-nginx-controller
-
-# Or if using hostNetwork, just use your control plane IP
-NODE_IP=$(hostname -I | awk '{print $1}')
+```bash
+# Since you're using hostNetwork, just use your worker node IP
+NODE_IP=<worker-node-IP>
 
 # Add to /etc/hosts (replace with your actual ingress host)
-echo "$NODE_IP test.example.com" | sudo tee -a /etc/hosts
+echo "$NODE_IP mydomain.com" | sudo tee -a /etc/hosts
 
 # Now curl normally
-curl http://test.example.com
+curl http://mydomain.com
 ```
 
 ---
