@@ -1122,7 +1122,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100MB
+      storage: 100Mi
   storageClassName: linode-block-storage-retain
 ```
 
@@ -1148,6 +1148,11 @@ spec:
     env:
     - name: POSTGRES_PASSWORD
       value: mysecretpassword
+    - name: PGDATA
+      value: /var/lib/postgresql/data/pgdata
+    ports:
+    - containerPort: 5432
+      name: postgres
     volumeMounts:
     - name: db-storage
       mountPath: /var/lib/postgresql/data
@@ -1240,14 +1245,18 @@ The **Linode CSI driver** allows Kubernetes to dynamically provision Linode Bloc
 ### Install the CSI Driver
 
 ```bash
-export VERSION=v0.6.0
 export REGION=us-ord
 
 kubectl delete secret linode -n kube-system
 
+helm repo add linode-csi https://linode.github.io/linode-blockstorage-csi-driver/
+helm repo update linode-csi
+
 helm install linode-csi-driver \
-  --set apiToken=$LINODE_API_TOKEN,region=$REGION \
-  https://github.com/linode/linode-blockstorage-csi-driver/releases/download/$VERSION/helm-chart-$VERSION.tgz
+  --namespace kube-system \
+  --set apiToken="${LINODE_API_TOKEN}" \
+  --set region="${REGION}" \
+  linode-csi/linode-blockstorage-csi-driver
 ```
 
 ---
