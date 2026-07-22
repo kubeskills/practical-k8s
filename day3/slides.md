@@ -563,24 +563,7 @@ spec:
           app: web     # only allow traffic from pods with web label
     ports:
     - protocol: TCP
-      port: 80
-```
-
-```bash
-kubectl apply -f netpol.yaml
-kubectl get networkpolicy
-
-# run web container with label app=web
-kubectl run web --rm -it --image=busybox -n dev --labels="app=web" -- sh
-
-# run backend pod with label app=backend
-kubectl run backend --rm -it --image=busybox -n dev --labels="app=backend" -- sh
-
-# from a shell inside the container
-wget -qO- --timeout=3 http://backend.dev.svc.cluster.local:80
-
-# from a shell inside the container
-wget -qO- --timeout=3 http://<backend-pod-ip>:80
+      port: 3306
 ```
 
 ---
@@ -602,17 +585,23 @@ spec:
   # no ingress rules = deny all
 ```
 
-```yaml
-# deny all egress from all pods in this namespace
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: deny-all-egress
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  # no egress rules = deny all
+---
+
+# Test connectivity 
+
+```bash
+kubectl apply -f netpol.yaml
+kubectl get networkpolicy
+
+# create backend service backend.dev.svc.cluster.local
+kubectl expose po backend --port 3306
+
+# run web container with label app=web
+kubectl run mysql-web --rm -it --image=mysql:8 -n dev --labels="app=web" --env="MYSQL_ROOT_PASSWORD=changeme" -- bash
+
+# from a shell inside the container
+mysql -h backend.dev.svc.cluster.local -P 3306 -u root -pSuperSecretP@ssword! -e "SELECT 1;"
+
 ```
 
 ---
