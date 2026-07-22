@@ -21,6 +21,48 @@ mdc: true
 **Instructor:** Chad M. Crowell
 
 ---
+layout: section
+---
+
+# Day 2 Knowledge Check
+
+8 quick questions before we dive into Day 3
+
+---
+
+# Quiz: Day 2 Recap
+
+<div class="text-sm">
+
+1. What is the management hierarchy between a Deployment, a ReplicaSet, and a Pod?
+2. In a Deployment's `rollingUpdate` strategy, which field controls the maximum number of pods that can be unavailable during an update?
+3. True or False: A failed **readiness** probe causes the container to be restarted.
+4. What must be installed in the cluster before a HorizontalPodAutoscaler can scale on CPU utilization?
+5. Which `kubectl create` flag generates a Deployment's YAML manifest without actually creating the resource?
+6. Are Kubernetes Secrets encrypted at rest by default, or just base64-encoded?
+7. Given `failureThreshold: 3`, what does the kubelet do after a pod's liveness probe fails 3 times in a row?
+8. Which `kubectl logs` flag shows the logs from a container's previous run after a crash?
+
+</div>
+
+---
+
+# Quiz: Answers
+
+<div class="text-sm">
+
+1. **Deployment → ReplicaSet → Pod** — the Deployment manages ReplicaSets, and each ReplicaSet manages the Pods
+2. **`maxUnavailable`** — `maxSurge` instead controls how many extra pods can exist above the desired count
+3. **False** — a failed readiness probe removes the pod from Service endpoints; it is **not** restarted. Only a failed **liveness** probe triggers a restart
+4. **The Metrics Server** — without it, the HPA has no CPU/memory metrics to scale against
+5. **`--dry-run=client -o yaml`** — e.g. `kubectl create deployment nginx --image=nginx:1.27 --dry-run=client -o yaml`
+6. **Base64-encoded, not encrypted** — anyone with API access can decode them; enable encryption at rest or use an external secret manager for real protection
+7. **The kubelet restarts the container** — liveness failures trigger a restart, unlike readiness failures
+8. **`kubectl logs <pod-name> --previous`**
+
+</div>
+
+---
 
 # Day 2 Recap
 
