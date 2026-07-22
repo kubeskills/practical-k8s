@@ -270,7 +270,7 @@ spec:
     app: web
   ports:
   - port: 80          # cluster-internal port
-    targetPort: 8080  # container port
+    targetPort: 80  # container port
     nodePort: 30080   # external port (30000–32767), or omit to auto-assign
 ```
 
@@ -291,6 +291,35 @@ curl http://<any-node-ip>:30080
 
 Provisions an **external load balancer** from the cloud provider and assigns a public IP.
 
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 80
+```
+
+```bash
+kubectl get svc web-lb
+# NAME     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
+# web-lb   LoadBalancer   10.96.45.14    45.79.123.45     80:31204/TCP   2m
+
+# access from the internet
+curl http://45.79.123.45
+```
+
+> The external IP is assigned by the **Cloud Controller Manager (CCM)**. On bare-metal clusters, use MetalLB to get this functionality.
+
+---
+
+# Install CCM
+
 ```bash
 # lab 7-11
 export LINODE_API_TOKEN="47a2e607e46ad17316cfab304bf59c4c6e75866daa66bfdddcd61e24bbee5a66"
@@ -305,32 +334,20 @@ kubectl create secret generic linode \
   --namespace kube-system \
   --from-literal=apiToken=$LINODE_API_TOKEN \
   --from-literal=region=us-ord
+
+# Install Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# install CCM
+helm repo add linode-cloud-controller-manager https://linode.github.io/linode-cloud-controller-manager/
+helm repo update
+
+helm upgrade --install ccm-linode \
+  linode-cloud-controller-manager/ccm-linode \
+  --namespace kube-system \
+  --set secretRef.name=linode
+
 ```
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: web-lb
-spec:
-  type: LoadBalancer
-  selector:
-    app: web
-  ports:
-  - port: 80
-    targetPort: 8080
-```
-
-```bash
-kubectl get svc web-lb
-# NAME     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
-# web-lb   LoadBalancer   10.96.45.14    45.79.123.45     80:31204/TCP   2m
-
-# access from the internet
-curl http://45.79.123.45
-```
-
-> The external IP is assigned by the **Cloud Controller Manager (CCM)**. On bare-metal clusters, use MetalLB to get this functionality.
 
 ---
 
