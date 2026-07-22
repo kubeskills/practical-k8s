@@ -241,7 +241,7 @@ spec:
     app: web
   ports:
   - port: 80          # port clients connect to
-    targetPort: 8080  # port the container listens on
+    targetPort: 80  # port the container listens on
 ```
 
 ```bash
