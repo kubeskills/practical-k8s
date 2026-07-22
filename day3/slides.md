@@ -884,18 +884,26 @@ A **Job** creates one or more pods and ensures they **run to completion**. Unlik
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-migrate
+  name: db-migrate-demo
 spec:
-  completions: 1          # total successful completions required
-  parallelism: 1          # pods running simultaneously
-  backoffLimit: 3         # retry up to 3 times on failure
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
   template:
     spec:
-      restartPolicy: OnFailure    # required for Jobs (Never or OnFailure)
+      restartPolicy: Never
       containers:
       - name: migrate
-        image: myapp:latest
-        command: ["python", "manage.py", "migrate"]
+        image: python:3.10.12
+        command:
+        - python
+        - -c
+        - |
+          print("Running demo migration")
+          print("Applying migration 0001_initial")
+          print("Applying migration 0002_add_index")
+          print("Migration complete")
 ```
 
 ```bash
