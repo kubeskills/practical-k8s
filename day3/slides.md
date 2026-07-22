@@ -303,7 +303,7 @@ export LINODE_API_TOKEN="0ceca26ac8b936b267993f1dad48100f32cd065f2369524dd73286e
 
 kubectl create secret generic linode \
   --namespace kube-system \
-  --from-literal=apiToken=$LINODE_API_TOKEN$ \
+  --from-literal=apiToken=$LINODE_API_TOKEN \
   --from-literal=region=us-ord
 ```
 
