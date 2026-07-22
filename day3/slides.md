@@ -291,6 +291,22 @@ curl http://<any-node-ip>:30080
 
 Provisions an **external load balancer** from the cloud provider and assigns a public IP.
 
+```bash
+# lab 7-11
+export LINODE_API_TOKEN="47a2e607e46ad17316cfab304bf59c4c6e75866daa66bfdddcd61e24bbee5a66"
+
+# lab 2-6
+export LINODE_API_TOKEN="3a74d5bd98cdfb5729b9fa8fed5a49b0784c2cabb1c8b7db40d43fb9a4709abe"
+
+# 12+
+export LINODE_API_TOKEN="0ceca26ac8b936b267993f1dad48100f32cd065f2369524dd73286e1003a3b40"
+
+kubectl create secret generic linode \
+  --namespace kube-system \
+  --from-literal=apiToken=$LINODE_API_TOKEN$ \
+  --from-literal=region=us-ord
+```
+
 ```yaml
 apiVersion: v1
 kind: Service
