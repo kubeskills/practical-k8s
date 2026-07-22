@@ -176,6 +176,8 @@ Node A                          Node B
 
 > Pod-to-pod traffic across nodes is routed through the underlying node network, encapsulated by the CNI plugin (VXLAN, BGP, etc.).
 
+- [life of a packet - video](https://youtu.be/0Omvgd7Hg1I?si=exsYJNXYia4psdup)
+
 ---
 
 # Services
