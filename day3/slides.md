@@ -322,7 +322,7 @@ curl http://45.79.123.45
 
 ```bash
 # lab 7-11
-export LINODE_API_TOKEN="47a2e607e46ad17316cfab304bf59c4c6e75866daa66bfdddcd61e24bbee5a66"
+export LINODE_API_TOKEN="de728e194e76c6fc414b6f19eee95a241b4f5c0db545ccab0dcc88f030a95c09"
 
 # lab 2-6
 export LINODE_API_TOKEN="3a74d5bd98cdfb5729b9fa8fed5a49b0784c2cabb1c8b7db40d43fb9a4709abe"
