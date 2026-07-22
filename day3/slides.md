@@ -1240,7 +1240,12 @@ The **Linode CSI driver** allows Kubernetes to dynamically provision Linode Bloc
 ### Install the CSI Driver
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/linode/linode-blockstorage-csi-driver/master/pkg/linode-bs/deploy/releases/linode-blockstorage-csi-driver-latest.yaml
+helm repo add linode-csi https://linode.github.io/linode-blockstorage-csi-driver/
+helm repo update linode-csi
+helm install linode-csi linode-csi/linode-csi \
+  --namespace kube-system \
+  --set linode.token=$LINODE_API_TOKEN \
+  --set linode.region=us-ord
 ```
 
 ### Dynamic PVC using the StorageClass
