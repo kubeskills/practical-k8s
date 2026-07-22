@@ -176,7 +176,6 @@ spec:
           limits:
             cpu: "500m"
             memory: "256Mi"
-
       - name: cpu-chaos
         image: busybox:1.36
         command:
