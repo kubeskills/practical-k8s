@@ -1,0 +1,581 @@
+# Consolidated, fully-formed YAML from every code block in day2/slides.md.
+# Many slides show partial spec: fragments to keep a slide focused - here each
+# fragment is completed into a valid, standalone manifest. Resource names are
+# disambiguated where the same name is reused across slides for different
+# variants (e.g. two ways to write the db-credentials Secret).
+#
+# These are teaching examples reconstructed for reference, not a deployable
+# stack - several resources intentionally overlap (e.g. the bare nginx Pod,
+# the nginx-rs ReplicaSet, and the nginx Deployment all select app=nginx to
+# show the Pod -> ReplicaSet -> Deployment progression) and are not meant to
+# be applied together.
+
+# --- Namespaces: Working with Namespaces ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+---
+# --- Pods, ReplicaSets, and Deployments: Pods - Revisited ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.27
+    ports:
+    - containerPort: 80
+
+---
+# --- Pods, ReplicaSets, and Deployments: ReplicaSets ---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+
+---
+# --- Pods, ReplicaSets, and Deployments: Creating a Deployment - Declarative ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+
+---
+# --- Pods, ReplicaSets, and Deployments: Rolling Update Strategy ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rollingupdate
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1    # at most 1 pod can be down during update
+      maxSurge: 1          # at most 1 extra pod above desired count
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+
+---
+# --- Pods, ReplicaSets, and Deployments: The Other Strategy - Recreate ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-recreate
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: Recreate    # kills ALL old pods first, then creates new ones
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+
+---
+# --- Scaling Applications: HPA in YAML ---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+---
+# --- Scaling Applications: Test HPA ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+      - name: cpu-chaos
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            yes > /dev/null &
+            yes > /dev/null &
+            wait
+          done
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "32Mi"
+          limits:
+            cpu: "400m"
+            memory: "64Mi"
+
+---
+# --- Scaling Applications: Resource Requests and Limits ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-requests-limits-demo
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.27
+    resources:
+      requests:        # guaranteed minimum
+        cpu: "100m"    # 100 millicores = 0.1 CPU
+        memory: "128Mi"
+      limits:          # maximum allowed
+        cpu: "500m"
+        memory: "256Mi"
+
+---
+# --- ConfigMaps and Secrets: Creating ConfigMaps - Declarative YAML ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_ENV: production
+  LOG_LEVEL: info
+  app.properties: |
+    server.port=8080
+    server.host=0.0.0.0
+
+---
+# --- ConfigMaps and Secrets: Consuming ConfigMaps - As Environment Variables (all keys) ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-envfrom-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    envFrom:
+    - configMapRef:
+        name: app-config     # injects ALL keys as env vars
+
+---
+# --- ConfigMaps and Secrets: Consuming ConfigMaps - Select specific keys ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-env-key-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    env:
+    - name: APP_ENVIRONMENT
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: APP_ENV
+
+---
+# --- ConfigMaps and Secrets: Consuming ConfigMaps (cont.) - As a Mounted Volume ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-volume-demo
+spec:
+  containers:
+  - image: myapp:latest
+    name: app
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config       # each key becomes a file in /etc/config/
+
+---
+# --- ConfigMaps and Secrets: Creating Secrets - Declarative YAML (base64 data) ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  DB_USER: YWRtaW4=           # echo -n "admin" | base64
+  DB_PASS: czNjcmV0UEBzcw==   # echo -n "s3cretP@ss" | base64
+
+---
+# --- ConfigMaps and Secrets: Creating Secrets (cont.) - stringData ---
+# Alternate way to write the same db-credentials Secret without manual base64
+# encoding; renamed to avoid colliding with the data: version above.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials-stringdata
+type: Opaque
+stringData:
+  DB_USER: admin
+  DB_PASS: s3cretP@ss
+
+---
+# --- ConfigMaps and Secrets: Consuming Secrets - As Environment Variables ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-envfrom-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    envFrom:
+    - secretRef:
+        name: db-credentials
+
+---
+# --- ConfigMaps and Secrets: Consuming Secrets - As a Mounted Volume ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-volume-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /etc/secrets
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: db-credentials   # each key becomes a file
+
+---
+# --- ConfigMaps and Secrets: Full Example: ConfigMap + Secret (ConfigMap) ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config
+  namespace: dev
+data:
+  APP_ENV: production
+  LOG_LEVEL: info
+  app.properties: |
+    server.port=8080
+    cache.ttl=300
+
+---
+# --- ConfigMaps and Secrets: Full Example: ConfigMap + Secret (Secret) ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secrets
+  namespace: dev
+type: Opaque
+stringData:
+  DB_USER: webapp
+  DB_PASS: Tr@iningOnly123
+  API_KEY: sk-demo-1234567890
+
+---
+# --- ConfigMaps and Secrets: Full Example: Consuming Both (merged across 3 slides) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: nginx:1.27.2
+        envFrom:
+        - configMapRef:
+            name: webapp-config     # APP_ENV, LOG_LEVEL as env vars
+        - secretRef:
+            name: webapp-secrets    # DB_USER, DB_PASS, API_KEY as env vars
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config    # app.properties as a file
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+      volumes:
+      - name: config-volume
+        configMap:
+          name: webapp-config
+      - name: secret-volume
+        secret:
+          secretName: webapp-secrets
+
+---
+# --- Health Checks: Liveness Probes - HTTP ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-http-demo
+spec:
+  containers:
+  - name: app
+    image: k8s.gcr.io/echoserver:1.10
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 10    # wait 10s before first check
+      periodSeconds: 5           # check every 5s
+      failureThreshold: 3        # restart after 3 consecutive failures
+
+---
+# --- Health Checks: Liveness Probes - TCP ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-tcp-demo
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.28
+    livenessProbe:
+      tcpSocket:
+        port: 80               # just checks if the port is open
+      periodSeconds: 10
+
+---
+# --- Health Checks: Liveness Probes (cont.) - Command/exec ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-exec-demo
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command:
+    - sh
+    - -c
+    - touch /tmp/healthy && sleep 3600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy            # exit code 0 = healthy
+      periodSeconds: 5
+
+---
+# --- Health Checks: Readiness Probes ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-http-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 3
+
+---
+# --- Health Checks: Startup Probes ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: startup-probe-demo
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      failureThreshold: 30       # 30 attempts
+      periodSeconds: 10          # every 10s = up to 300s (5 min) to start
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      periodSeconds: 5
+
+---
+# --- Hands-On Labs: Lab 1 - Deploy a Multi-Replica Application ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            memory: "128Mi"
+
+---
+# --- Hands-On Labs: Lab 4 - ConfigMaps and Secrets (consume in a pod) ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-demo
+spec:
+  containers:
+  - name: demo
+    image: busybox
+    command: ["sh", "-c", "echo $WELCOME_MSG && echo API_KEY=$API_KEY && sleep 3600"]
+    envFrom:
+    - configMapRef:
+        name: web-config
+    env:
+    - name: API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: web-secret
+          key: API_KEY
+
+---
+# --- Hands-On Labs: Lab 5 - Health Checks (merged across 3 slides) ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-demo
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command:
+    - sh
+    - -c
+    - |
+      touch /tmp/healthy
+      echo "App started"
+      sleep 30
+      rm /tmp/healthy
+      echo "App became unhealthy"
+      sleep 600
+    livenessProbe:
+      exec:
+        command: ["cat", "/tmp/healthy"]
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    readinessProbe:
+      exec:
+        command: ["cat", "/tmp/healthy"]
+      initialDelaySeconds: 5
+      periodSeconds: 5
