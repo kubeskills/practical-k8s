@@ -1290,12 +1290,23 @@ An **Ingress resource** is just configuration — you need an **Ingress Controll
 ### Install ingress-nginx
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
+# Install Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Create namespace
+kubectl create namespace ingress-nginx
+
+# Deploy with hostNetwork enabled
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx \
+  --set controller.hostNetwork=true \
+  --set controller.service.enabled=false
 
 # verify the controller is running
 kubectl get pods -n ingress-nginx
 kubectl get svc -n ingress-nginx
-# ingress-nginx-controller   LoadBalancer   10.96.x.x   <external-ip>   80:30080/TCP,443:30443/TCP
+# ingress-nginx-controller   ClusterIP   10.99.x.x   <external-ip>   80:30080/TCP,443:30443/TCP
 ```
 
 ---
@@ -1307,16 +1318,22 @@ kubectl get svc -n ingress-nginx
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: web-ingress
+  name: test-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
-  - host: myapp.example.com
+  - host: mydomain.com
     http:
       paths:
-...
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: your-service
+            port:
+              number: 80
 ```
 
 <div class="text-sm mt-4">

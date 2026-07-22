@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+  namespace: dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - image: httpd
+        name: httpd
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
