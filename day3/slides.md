@@ -1122,8 +1122,8 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
-  storageClassName: manual
+      storage: 100MB
+  storageClassName: linode-block-storage-retain
 ```
 
 ```bash
@@ -1233,7 +1233,7 @@ PV created and PVC bound
 
 ---
 
-# Linode Block Storage CSI Driver
+## Linode Block Storage CSI Driver
 
 The **Linode CSI driver** allows Kubernetes to dynamically provision Linode Block Storage volumes.
 
@@ -1249,6 +1249,8 @@ helm install linode-csi-driver \
   --set apiToken=$LINODE_API_TOKEN,region=$REGION \
   https://github.com/linode/linode-blockstorage-csi-driver/releases/download/$VERSION/helm-chart-$VERSION.tgz
 ```
+
+---
 
 ### Dynamic PVC using the StorageClass
 
