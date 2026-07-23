@@ -346,7 +346,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: dev-team-edit
-  namespace: staging
+  namespace: dev
 subjects:
 - kind: Group
   name: dev-team
