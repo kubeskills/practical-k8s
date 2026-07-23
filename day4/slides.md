@@ -21,6 +21,46 @@ mdc: true
 **Instructor:** Chad M. Crowell
 
 ---
+layout: section
+---
+
+# Day 3 Knowledge Check
+
+8 quick questions before we dive into Day 4
+
+---
+
+# Quiz: Day 3 Recap
+
+<div class="text-sm">
+
+1. What DNS name format does Kubernetes automatically assign to every Service?
+2. True or False: A pod with no NetworkPolicy selecting it is fully open to traffic from all other pods.
+3. What's the difference between a taint's `NoSchedule` effect and its `NoExecute` effect?
+4. Which Job field controls how many pods run **at the same time**?
+5. What object does Kubernetes automatically create to track which pod IPs sit behind a Service, and which `kubectl` command inspects it when traffic isn't routing?
+6. True or False: A StorageClass with `volumeBindingMode: WaitForFirstConsumer` binds the PVC to a PV immediately, before the pod is scheduled.
+7. Which PV reclaim policy should you use for production databases to avoid accidental data loss when a PVC is deleted?
+
+</div>
+
+---
+
+# Quiz: Answers
+
+<div class="text-sm">
+
+1. **`<service-name>.<namespace>.svc.cluster.local`**
+2. **True** — with no policy selecting it, a pod allows all ingress/egress traffic by default
+3. **`NoSchedule`** blocks new non-tolerating pods from scheduling but leaves existing pods alone; **`NoExecute`** does that **and evicts** already-running pods that don't tolerate it
+4. **`parallelism`** — `completions` controls the total number of successful runs needed, not concurrency
+5. **The `Endpoints` object** — `kubectl get endpoints <svc-name>`; an empty list means the Service's selector doesn't match any pod labels
+6. **False** — `WaitForFirstConsumer` **delays** binding until a pod using the PVC is scheduled, which avoids provisioning storage in the wrong zone
+7. **`Retain`** — the PV and underlying volume survive PVC deletion instead of being deleted automatically
+
+</div>
+
+---
 
 # Day 3 Recap
 
@@ -248,6 +288,18 @@ Kubernetes ships with several pre-built ClusterRoles:
 # list all ClusterRoles
 kubectl get clusterroles
 
+# list cluster-admin
+kubectl get clusterrole cluster-admin
+
+# get client-certificate-data
+kubectl config view --raw
+
+# base64 decode
+echo "" | base64 -d | openssl x509 -text -noout | grep -A1 "Subject:"
+
+# cluster role binding
+kubectl get clusterrolebinding cluster-admin
+
 # inspect the built-in view role
 kubectl describe clusterrole view
 
@@ -271,12 +323,15 @@ Groups let you grant permissions to multiple users at once. The `O` field in the
 <div>
 
 ```bash
+# create keys for bob
+openssl genrsa -out bob.key 2048
+
 # create a user in the "dev-team" group
-openssl req -new -key dev.key -out dev.csr \
+openssl req -new -key bob.key -out bob.csr \
   -subj "/CN=bob/O=dev-team"
 
 # sign the cert with the cluster CA
-sudo openssl x509 -req -in dev.csr \
+sudo openssl x509 -req -in bob.csr \
   -CA /etc/kubernetes/pki/ca.crt \
   -CAkey /etc/kubernetes/pki/ca.key \
   -CAcreateserial -out bob.crt -days 365
