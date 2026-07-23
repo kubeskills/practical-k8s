@@ -791,7 +791,7 @@ kubectl port-forward svc/monitoring-kube-prometheus-prometheus \
 # create SSH tunnel (local port forward)
 ssh -f -N \
   -L 3000:localhost:3000 \
-  -L 9090:localhost:9000 \
+  -L 9090:localhost:9090 \
   admin@controlplane
   
 # OPTIONAL reverse tunnel (remote port forward)
