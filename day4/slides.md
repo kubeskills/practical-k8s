@@ -520,6 +520,11 @@ kubectl label namespace staging \
 
 > `enforce` = reject violating pods. `warn` = allow but emit a warning. `audit` = allow and log to audit log.
 
+```bash
+# add PodSecurity to kube-apiserver.yaml
+sudo sed -i 's/--enable-admission-plugins=\([^"]*\)/--enable-admission-plugins=\1,PodSecurity/' /etc/kubernetes/manifests/kube-apiserver.yaml
+```
+
 ---
 
 # RBAC Troubleshooting
@@ -782,6 +787,18 @@ PodMonitor (CRD)     → tells Prometheus which Pods to scrape
 kubectl port-forward svc/monitoring-kube-prometheus-prometheus \
   9090:9090 -n monitoring
 # open http://localhost:9090
+
+# create SSH tunnel (local port forward)
+ssh -f -N \
+  -L 3000:localhost:3000 \
+  -L 9090:localhost:9000 \
+  admin@controlplane
+  
+# OPTIONAL reverse tunnel (remote port forward)
+ssh -R 9090:localhost:9090 admin@controlplane
+
+# find the service to kill the tunnel
+ps aux | grep "prom-tunnel\|port-forward"
 ```
 
 
@@ -818,6 +835,12 @@ kube_deployment_status_replicas_ready
 kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring
 # open http://localhost:3000
 # default credentials: admin / admin123
+
+# create SSH tunnel
+ssh -f -N \
+  -L 3000:localhost:3000 \
+  -L 9090:localhost:9000 \
+  admin@controlplane
 ```
 
 ---
