@@ -49,7 +49,7 @@ day2/
 
 ## Labs
 
-Work through the labs in order — later labs build on resources created in earlier ones.
+See [labs/README.md](labs/README.md) for how to use these labs. Work through the labs in order — later labs build on resources created in earlier ones.
 
 | # | Lab | Topics |
 |---|-----|--------|

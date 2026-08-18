@@ -34,6 +34,8 @@ day4/
 
 ## Labs
 
+See [labs/README.md](labs/README.md) for how to use these labs.
+
 | # | Lab | Topics |
 |---|-----|--------|
 | 1 | [RBAC and Access Control](labs/lab1-rbac-and-access-control.md) | Roles, RoleBindings, ServiceAccounts, `auth can-i` |

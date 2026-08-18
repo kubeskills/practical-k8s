@@ -29,7 +29,7 @@ day1/
 
 ## Labs
 
-Work through the labs in order — each lab builds directly on the previous one.
+See [labs/README.md](labs/README.md) for how to use these labs. Work through the labs in order — each lab builds directly on the previous one.
 
 | # | Lab | Topics |
 |---|-----|--------|

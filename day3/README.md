@@ -48,7 +48,7 @@ day3/
 
 ## Labs
 
-Work through the labs in order — later labs may depend on resources from earlier ones.
+See [labs/README.md](labs/README.md) for how to use these labs. Work through the labs in order — later labs may depend on resources from earlier ones.
 
 | # | Lab | Topics |
 |---|-----|--------|
