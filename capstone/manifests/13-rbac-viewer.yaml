@@ -1,0 +1,35 @@
+# A least-privilege ServiceAccount: read-only access to Pods, Services, and
+# ConfigMaps within the capstone namespace only — no Secrets, no writes, no
+# cluster-wide access. Compare against day4/manifests/role-pod-reader.yaml.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: capstone-viewer
+  namespace: capstone
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: capstone-viewer-role
+  namespace: capstone
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: capstone-viewer-binding
+  namespace: capstone
+subjects:
+  - kind: ServiceAccount
+    name: capstone-viewer
+    namespace: capstone
+roleRef:
+  kind: Role
+  name: capstone-viewer-role
+  apiGroup: rbac.authorization.k8s.io

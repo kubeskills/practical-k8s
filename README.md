@@ -38,6 +38,11 @@ This 4-day hands-on training covers practical Kubernetes administration from clu
 - Troubleshooting and Cluster Operations
 - **Labs:** RBAC configuration, monitoring setup, cluster upgrades ([labs/](day4/labs/))
 
+### [Capstone: The Notes App](capstone/)
+- Cumulative lab combining Deployments, Services, storage, NetworkPolicies, RBAC, and troubleshooting from all four days
+- Objective-driven (not command-by-command) with a full reference solution
+- Optional disaster-recovery stretch goal using etcd backup/restore
+
 ### [Core Reference Pack](reference/)
 - kubectl quick reference (commands, flags, common patterns)
 - Kubernetes architecture & components cheat sheet

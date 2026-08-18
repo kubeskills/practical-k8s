@@ -1,0 +1,19 @@
+# default-deny-all blocks egress to CoreDNS too — without this, no pod in
+# the namespace can resolve any Service DNS name (see Day 3 CoreDNS coverage).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: capstone
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

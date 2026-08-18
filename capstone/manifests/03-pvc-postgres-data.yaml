@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: capstone
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # Uses the Day 3 Linode StorageClass (day3/manifests/storageclass-linode.yaml).
+  # On a different cluster, either apply an equivalent StorageClass first or
+  # delete this line to fall back to the cluster's default StorageClass.
+  storageClassName: linode-block-storage
+  resources:
+    requests:
+      storage: 2Gi

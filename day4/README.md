@@ -95,6 +95,12 @@ See the [Core Reference Pack](../reference/) for printable cheat sheets — kube
 
 ---
 
+## What's Next: The Capstone
+
+Finished all four days? [The Notes App capstone](../capstone/) pulls together everything you've learned — Deployments, Services, storage, NetworkPolicies, RBAC, and troubleshooting — into one cumulative, objective-driven lab.
+
+---
+
 ## Continue Your Journey with KubeSkills
 
 [KubeSkills](https://kubeskills.com) is a global Kubernetes learning community with hands-on labs, courses, and a daily learning series.

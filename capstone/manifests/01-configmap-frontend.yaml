@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-content
+  namespace: capstone
+data:
+  index.html: |
+    <!doctype html>
+    <html>
+      <head><title>Capstone Notes</title></head>
+      <body>
+        <h1>Capstone Notes — Frontend</h1>
+        <p>If you can see this page through the Ingress, connectivity from
+           the outside world to the frontend Pod is working.</p>
+      </body>
+    </html>

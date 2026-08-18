@@ -1,0 +1,22 @@
+# Allows traffic from the ingress-nginx controller (any namespace, matched
+# by label) into the frontend Pods. Adjust the namespaceSelector label to
+# match how your ingress controller's namespace is labeled if it differs.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-frontend
+  namespace: capstone
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080

@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: capstone
+  labels:
+    app: backend
+spec:
+  replicas: 1 # a single Postgres replica — replication is out of scope for this capstone
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999 # the postgres image's built-in "postgres" user
+        runAsGroup: 999
+        fsGroup: 999 # so the mounted PVC is writable by that user
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgres:16.4
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_PASS
+            - name: POSTGRES_DB
+              value: notes
+            # PGDATA must be a subdirectory, not the mount root — Postgres
+            # refuses to initialize a data dir that already contains
+            # filesystem metadata (e.g. lost+found) from some CSI drivers.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            # readOnlyRootFilesystem requires writable homes for these —
+            # Postgres writes its unix socket and temp files here at runtime.
+            - name: run-postgresql
+              mountPath: /var/run/postgresql
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-data
+        - name: run-postgresql
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

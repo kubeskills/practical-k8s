@@ -1,0 +1,29 @@
+# Caps total namespace consumption and gives every container a default
+# request/limit if one isn't specified (see day2/labs/lab7-namespaces-in-practice.md).
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: capstone-quota
+  namespace: capstone
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+    pods: "10"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: capstone-limits
+  namespace: capstone
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 250m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
