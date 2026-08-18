@@ -51,3 +51,16 @@ sudo etcdctl snapshot save /tmp/backup.db \
   --cert=/etc/kubernetes/pki/etcd/server.crt \
   --key=/etc/kubernetes/pki/etcd/server.key
 ```
+
+---
+
+## Continue Your Journey with KubeSkills
+
+[KubeSkills](https://kubeskills.com) is a global Kubernetes learning community with hands-on labs, courses, and a daily learning series.
+
+| Resource | Description |
+|---|---|
+| [Join the community / newsletter](https://subscribe.kubeskills.com) | Get regular Kubernetes labs and tips in your inbox |
+| [Kubernetes from Scratch course](https://community.kubeskills.com/c/kubernetes-from-scratch) | Deep dive into cluster internals, controllers, Prometheus, ArgoCD, operators, and security |
+| [Blog](https://blog.kubeskills.com) | Short, scenario-based posts on autoscaling, GitOps, observability, and more |
+| [YouTube labs & walkthroughs](https://youtube.com/@kubeskills) | Follow along with operator builds, observability setups, and other hands-on content |

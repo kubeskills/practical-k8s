@@ -1776,9 +1776,25 @@ kubectl get namespace before-backup
 - **CKA** — Certified Kubernetes Administrator (uses everything from this course)
 - **CKAD** — Certified Kubernetes Application Developer
 - **CKS** — Certified Kubernetes Security Specialist
-- **KubeSkills** — https://kubeskills.com
 - **Acing the CKA** — acingthecka.com
 
-### Thank You
+---
+
+# Continue Your Journey with KubeSkills
+
+[KubeSkills](https://kubeskills.com) — a global Kubernetes learning community with hands-on labs, courses, and a daily learning series.
+
+- **Join the community / newsletter** — [subscribe.kubeskills.com](https://subscribe.kubeskills.com)
+  Get regular Kubernetes labs and tips in your inbox.
+- **Kubernetes from Scratch course** — [community.kubeskills.com/c/kubernetes-from-scratch](https://community.kubeskills.com/c/kubernetes-from-scratch)
+  Deep dive into cluster internals, controllers, Prometheus, ArgoCD, operators, and security.
+- **Blog** — [blog.kubeskills.com](https://blog.kubeskills.com)
+  Short, scenario-based posts on autoscaling, GitOps, observability, and more.
+- **YouTube labs & walkthroughs** — [youtube.com/@kubeskills](https://youtube.com/@kubeskills)
+  Follow along with operator builds, observability setups, and other hands-on content.
+
+---
+
+# Thank You
 
 It's been a great week. Keep building, keep breaking things, and keep learning.
