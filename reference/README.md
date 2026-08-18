@@ -6,6 +6,7 @@ Printable cheat sheets for use throughout the course. Content is adapted from of
 |---|---|---|
 | kubectl quick reference — commands and flags for pods, deployments, services, debugging, and common patterns | [kubectl-quick-reference.md](kubectl-quick-reference.md) | [kubectl-quick-reference.pdf](kubectl-quick-reference.pdf) |
 | Kubernetes architecture & components cheat sheet — control plane, node components, addons | [kubernetes-architecture-cheatsheet.md](kubernetes-architecture-cheatsheet.md) | [kubernetes-architecture-cheatsheet.pdf](kubernetes-architecture-cheatsheet.pdf) |
+| CKA exam objectives → course map — maps every official CKA curriculum objective to the lab, slide, or manifest that covers it | [cka-exam-objectives-map.md](cka-exam-objectives-map.md) | [cka-exam-objectives-map.pdf](cka-exam-objectives-map.pdf) |
 
 ## Official Tutorials & Interactive Labs
 

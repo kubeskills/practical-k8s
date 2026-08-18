@@ -39,6 +39,7 @@ This 4-day hands-on training covers practical Kubernetes administration from clu
 ### [Core Reference Pack](reference/)
 - kubectl quick reference (commands, flags, common patterns)
 - Kubernetes architecture & components cheat sheet
+- CKA exam objectives → course map
 - Printable PDFs alongside markdown source
 
 ---

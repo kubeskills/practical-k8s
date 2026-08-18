@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Renders reference/*.md into printable PDFs at reference/*.pdf using marked + playwright-chromium.
-import { readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
@@ -11,7 +11,7 @@ const referenceDir = join(__dirname, '..', 'reference');
 
 const files = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : ['kubectl-quick-reference.md', 'kubernetes-architecture-cheatsheet.md'];
+  : (await readdir(referenceDir)).filter((f) => f.endsWith('.md') && f !== 'README.md');
 
 const template = (title, body) => `<!doctype html>
 <html>
