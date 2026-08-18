@@ -16,7 +16,7 @@ This 4-day hands-on training covers practical Kubernetes administration from clu
 - Containers vs Virtual Machines
 - Kubernetes Architecture
 - Installing and Configuring Kubernetes
-- **Labs:** Cluster provisioning, kubeadm setup, CNI deployment
+- **Labs:** Cluster provisioning, kubeadm setup, CNI deployment ([labs/](day1/labs/))
 
 ### [Day 2: Core Concepts and Workload Management](day2/)
 - Managing Kubernetes Objects
