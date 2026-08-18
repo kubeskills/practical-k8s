@@ -21,20 +21,20 @@ This 4-day hands-on training covers practical Kubernetes administration from clu
 ### [Day 2: Core Concepts and Workload Management](day2/)
 - Managing Kubernetes Objects
 - Command-Line Tools and Workflows
-- **Labs:** Deployments, ConfigMaps, Secrets, Health Checks
+- **Labs:** Deployments, ConfigMaps, Secrets, Health Checks ([labs/](day2/labs/))
 
 ### [Day 3: Networking, Scheduling, and Storage](day3/)
 - Kubernetes Networking
 - Scheduling and Workload Distribution
 - Persistent Storage
 - Ingress and Gateway API
-- **Labs:** Services, Ingress, Storage configuration, LoadBalancers
+- **Labs:** Services, Ingress, Storage configuration, LoadBalancers ([labs/](day3/labs/))
 
 ### [Day 4: Security, Monitoring, and Troubleshooting](day4/)
 - Security Essentials (RBAC, Network Policies)
 - Monitoring and Observability
 - Troubleshooting and Cluster Operations
-- **Labs:** RBAC configuration, monitoring setup, cluster upgrades
+- **Labs:** RBAC configuration, monitoring setup, cluster upgrades ([labs/](day4/labs/))
 
 ### [Core Reference Pack](reference/)
 - kubectl quick reference (commands, flags, common patterns)
