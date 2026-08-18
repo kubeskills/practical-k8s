@@ -106,3 +106,9 @@ All commands from today's slides are collected in [`kubectl-commands.sh`](kubect
 - Ingress & Gateway API
 - Linode CCM
 - Labs 1–6
+
+---
+
+## Reference
+
+See the [Core Reference Pack](../reference/) for printable cheat sheets — kubectl quick reference and the Kubernetes architecture & components overview.

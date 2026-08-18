@@ -84,3 +84,9 @@ day4/
 | etcd Backup and Restore | Snapshot save/restore procedure |
 | Cluster Maintenance | Cordon, drain, uncordon, HA control plane join |
 | Labs 1–5 | All lab commands in sequence |
+
+---
+
+## Reference
+
+See the [Core Reference Pack](../reference/) for printable cheat sheets — kubectl quick reference and the Kubernetes architecture & components overview.

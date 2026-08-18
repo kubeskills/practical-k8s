@@ -109,3 +109,9 @@ All commands from today's slides are collected in [`kubectl-commands.sh`](kubect
 - Health probes
 - Troubleshooting
 - Labs 1–7
+
+---
+
+## Reference
+
+See the [Core Reference Pack](../reference/) for printable cheat sheets — kubectl quick reference and the Kubernetes architecture & components overview.
