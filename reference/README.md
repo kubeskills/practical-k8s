@@ -7,6 +7,16 @@ Printable cheat sheets for use throughout the course. Content is adapted from of
 | kubectl quick reference — commands and flags for pods, deployments, services, debugging, and common patterns | [kubectl-quick-reference.md](kubectl-quick-reference.md) | [kubectl-quick-reference.pdf](kubectl-quick-reference.pdf) |
 | Kubernetes architecture & components cheat sheet — control plane, node components, addons | [kubernetes-architecture-cheatsheet.md](kubernetes-architecture-cheatsheet.md) | [kubernetes-architecture-cheatsheet.pdf](kubernetes-architecture-cheatsheet.pdf) |
 
+## Official Tutorials & Interactive Labs
+
+No install required — use these to practice outside of class or between lab environments.
+
+| Resource | Description |
+|---|---|
+| [Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/) (official) | Interactive, browser-based tutorials covering Pods, Deployments, Services, and more |
+| [Play with Kubernetes](https://labs.play-with-k8s.com/) | Free, ephemeral clusters in the browser for safe experimentation without local setup |
+| [Killercoda Kubernetes scenarios](https://killercoda.com/kubernetes) | Guided, browser-terminal labs for networking, troubleshooting, and core objects |
+
 ## Official upstream sources
 
 - [kubectl Quick Reference](https://kubernetes.io/docs/reference/kubectl/quick-reference/) — kubernetes.io
