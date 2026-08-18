@@ -36,6 +36,11 @@ This 4-day hands-on training covers practical Kubernetes administration from clu
 - Troubleshooting and Cluster Operations
 - **Labs:** RBAC configuration, monitoring setup, cluster upgrades
 
+### [Core Reference Pack](reference/)
+- kubectl quick reference (commands, flags, common patterns)
+- Kubernetes architecture & components cheat sheet
+- Printable PDFs alongside markdown source
+
 ---
 
 ## 🚀 Getting Started

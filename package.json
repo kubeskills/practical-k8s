@@ -13,13 +13,15 @@
     "export:day1": "slidev export day1/slides.md --output dist/day1-slides.pdf --with-toc",
     "export:day2": "slidev export day2/slides.md --output dist/day2-slides.pdf --with-toc",
     "export:day3": "slidev export day3/slides.md --output dist/day3-slides.pdf --with-toc",
-    "export:day4": "slidev export day4/slides.md --output dist/day4-slides.pdf --with-toc"
+    "export:day4": "slidev export day4/slides.md --output dist/day4-slides.pdf --with-toc",
+    "reference:pdf": "node scripts/md-to-pdf.mjs"
   },
   "dependencies": {
     "@slidev/cli": "^51.0.0",
     "@slidev/theme-default": "latest"
   },
   "devDependencies": {
+    "marked": "^16.4.2",
     "playwright-chromium": "^1.58.2"
   }
 }
