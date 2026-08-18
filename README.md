@@ -10,6 +10,8 @@
 
 This 4-day hands-on training covers practical Kubernetes administration from cluster setup through advanced troubleshooting. Each day includes guided labs in cloud-based environments.
 
+📄 [Participant Guide](<assets/Participant Guide - Practical Kubernetes Administration and Troubleshooting_Date Feb 17-20th.pdf>) — course objectives, agenda, and instructor bio (from the Feb 17–20, 2026 cohort)
+
 ## 📚 Daily Schedule
 
 ### [Day 1: Foundations and Cluster Setup](day1/)

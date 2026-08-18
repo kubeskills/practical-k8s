@@ -11,6 +11,7 @@ day1/
 ├── slides.md               # Presentation slides (Slidev)
 ├── slides/                 # Exported slide PDF
 │   └── day1-slides.pdf
+├── kubectl-commands.sh     # All commands from the slides, organized by topic
 ├── labs/                   # Hands-on lab guides
 │   ├── README.md
 │   ├── lab1-provisioning-the-cluster.md
@@ -48,6 +49,22 @@ See [labs/README.md](labs/README.md) for how to use these labs. Work through the
 |------|------|-------------|
 | [kubeconfig-example.yaml](manifests/kubeconfig-example.yaml) | Config | Example kubeconfig structure (reference only, not applied) |
 | [pod-nginx.yaml](manifests/pod-nginx.yaml) | Pod | Basic nginx pod for onboarding |
+
+---
+
+## kubectl Commands
+
+All commands from today's slides and labs are collected in [`kubectl-commands.sh`](kubectl-commands.sh), organized by topic:
+
+- Lab 1: Provisioning the cluster (SSH, hostnames)
+- Preparing the nodes (swap, kernel modules, sysctl, containerd)
+- Installing kubeadm, kubelet, kubectl
+- Lab 2: kubeadm cluster initialization, kubectl access, joining workers
+- Lab 3: CNI plugin installation (Calico)
+- Lab 4: Cluster validation
+- Bash autocomplete and alias
+- Lab 5: Exploring core components (etcd, certificates, new user)
+- Lab 6: Onboard a pod
 
 ---
 
